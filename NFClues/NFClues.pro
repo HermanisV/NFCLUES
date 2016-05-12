@@ -1,6 +1,7 @@
 TEMPLATE = app
 
 QT += qml quick widgets
+QT += qml
 
 CONFIG += c++11
 
@@ -13,3 +14,7 @@ QML_IMPORT_PATH =
 
 # Default rules for deployment.
 include(deployment.pri)
+
+FORMS +=
+
+HEADERS +=
