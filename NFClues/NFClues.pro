@@ -1,11 +1,17 @@
 TEMPLATE = app
 
+QT += qml quick
 QT += qml quick widgets
-QT += qml
-
+QT += core
+QT       += network
+QT += sql
+android{
+QT += androidextras
+}
 CONFIG += c++11
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    userhandler.cpp
 
 RESOURCES += qml.qrc
 
@@ -15,6 +21,5 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-FORMS +=
-
-HEADERS +=
+HEADERS += \
+    userhandler.h
