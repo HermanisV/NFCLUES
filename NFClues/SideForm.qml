@@ -61,8 +61,8 @@ Item {
             console.log("There was an Error: " + errorString)
             itmSideForm.userOK = false
         }
-//        onGotLogin: {
-//            itmSideForm.userOK = true
-//        }
+        onGotLogin: {
+            itmSideForm.userOK = true
+        }
     }
 }
