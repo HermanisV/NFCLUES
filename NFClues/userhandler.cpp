@@ -1,16 +1,17 @@
 #include "userhandler.h"
-#include "usermodel.h"
 #include <QDebug>
 #include <QObject>
 #include <QQuickItem>
-#include <QSharedDataPointer>
+#include <QString>
 #include <QtCore>
 #include <QtSql>
+#include <QQmlContext>
+#include <QErrorMessage>
 #include <QCryptographicHash>
 
 UserHandler::UserHandler(QObject *parent) : QObject(parent)
 {
-
+    connect(this,SIGNAL(gotError(QString)), this,SLOT(handleError(QString)));
 }
 
 int UserHandler::userId()
@@ -43,9 +44,17 @@ int UserHandler::role()
     return l_role;
 }
 
+QString UserHandler::errorString()
+{
+    return l_error;
+}
+
 void UserHandler::setUserId(const int &userId)
 {
+    if (l_userId == userId)
+        return;
     l_userId = userId;
+    emit userIdChanged();
 }
 
 void UserHandler::setLogin(const QString &login)
@@ -76,59 +85,155 @@ void UserHandler::setRole(const int &role)
 void UserHandler::createNewUser()
 {
     qDebug() << "In UserHandler.createNewUser";
+    QSqlDatabase db = connectDb();
+
+    if (db.open())
+    {
+        qDebug() << "DB connection opened.";
+        QSqlQuery UserFetch;
+        //Check for existing user under this email or login
+        QString user_query = QString("select * from users where login = '%1' or email = '%2'").arg(l_login).arg(l_email);
+        qDebug() << "Querry "<< user_query;
+        if (UserFetch.exec(user_query))
+        {
+            if (UserFetch.next()) {
+                qDebug() << "Login taken";
+                db.close();
+                gotError("Email or Login is taken");
+            }
+            else
+            {
+                qDebug() << "No existing record found, inserting new";
+                QString InsertQry = QString("insert into users values ((NEXT VALUE FOR user_seq),'%1',HASHBYTES( 'MD5','%2'),123,'%3',0,1,CURRENT_TIMESTAMP)").arg(l_login).arg(l_password).arg(l_email);
+                QSqlQuery NewUserInsert;
+//                NewUserInsert.prepare(InsertQry);
+//                NewUserInsert.bindValue(":login",l_login);
+//                NewUserInsert.bindValue(":pass",l_password);
+//                NewUserInsert.bindValue(":salt",123);   //Hash is not salted yet
+//                NewUserInsert.bindValue(":email",l_email);
+//                NewUserInsert.bindValue(":role",1);     //Role 1 is normal user
+
+                if (NewUserInsert.exec(InsertQry))
+                {
+                    qDebug() << "Inserted";
+                    emit gotLogin();
+                }
+                else
+                {
+                    qDebug() << "Error happened - " << db.lastError().text();
+                    qDebug() << "Closing connection";
+                    db.close();
+                    gotError("Ooops, there seems to be a problem");
+                }
+            }
+        }
+        else
+        {
+            qDebug() << "Error happened - " << db.lastError().text();
+            qDebug() << "Closing connection";
+            db.close();
+            gotError("Ooops, there seems to be a problem");
+        }
+    }
+    else
+    {
+        qDebug() << "Error happened - " << db.lastError().text();
+        qDebug() << "Closing connection";
+        db.close();
+        gotError("Ooops, there seems to be a problem");
+    }
+}
+
+void UserHandler::loginUser(QString p_login, QString p_pass)
+{
+    qDebug() << "In UserHandler.loginUser";
+    QSqlDatabase db = connectDb();
+
+    if (db.open())
+    {
+        qDebug() << "DB connection opened.";
+        QSqlQuery UserFetch;
+        //Check for existing user under this login pass combination
+        QString user_query = QString("select * from users where login = '%1' and PasswordHash = HASHBYTES( 'MD5','%2')").arg(p_login).arg(p_pass);
+        qDebug() << "Querry "<< user_query;
+        if (UserFetch.exec(user_query))
+        {
+            if (UserFetch.next()) {
+                qDebug() << "Login user found";
+                //                QCryptographicHash md5_generator(QCryptographicHash::Md5);
+                //                md5_generator.addData(p_pass.toLocal8Bit(),64);
+                //                qDebug() << md5_generator.result().toHex();
+                //                QCryptographicHash md5Generator(QCryptographicHash::Md5);
+                //                md5Generator.addData(p_pass.toLocal8Bit(),64);
+                //                QByteArrayData passHash = md5Generator.result().toHex();
+
+                //               // QByteArray passHash = QCryptographicHash::hash(p_pass.toLocal8Bit(),QCryptographicHash::Md5).toHex();
+                //                QByteArray oldPass = UserFetch.value(2).toByteArray().toHex();
+                //                qDebug()<< "New hash "<< md5_generator.result().toHex();
+                //                qDebug()<< "Old hash "<< oldPass;
+                //                if(md5_generator.result().toHex() == oldPass){
+
+                qDebug() << "Password match";
+                l_userId = UserFetch.value(0).toInt();
+                l_login  = UserFetch.value(1).toString();
+                l_email  = UserFetch.value(4).toString();
+                l_points = UserFetch.value(5).toInt();
+                l_role   = UserFetch.value(6).toInt();
+                emit gotLogin();
+            }
+            //                }
+            else
+            {//PW don't match
+                qDebug() << "Login and pass combination is incorrect";
+                qDebug() << "Error happened - " << db.lastError().text();
+                qDebug() << "Closing connection";
+                db.close();
+                gotError("Wrong login");
+            }
+    }
+    else
+    {
+        qDebug() << "Error happened - " << db.lastError().text();
+        qDebug() << "Closing connection";
+        db.close();
+        gotError("Ooops, there seems to be a problem");
+    }
+}
+else
+{
+qDebug() << "Error happened - " << db.lastError().text();
+qDebug() << "Closing connection";
+db.close();
+gotError("Ooops, there seems to be a problem");
+}
+}
+
+void UserHandler::handleError(QString p_error)
+{
+    qDebug() << "Error happened";
+    if (p_error == l_error)
+    {
+        return;
+    }
+    else
+    {
+        l_error = p_error;
+        emit error();
+    }
+}
+
+QSqlDatabase UserHandler::connectDb()
+{
+    qDebug() << "In UserHandler.connectDb";
     //Server and DB variables
     QString ServerName = "nfclues";
     QString DBName = "NFClues_DB";
     QString Login = "verhoher";
     QString Pass = "Vietejais3Brown";
-    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC3");
+    QSqlDatabase p_db = QSqlDatabase::addDatabase("QODBC3");
 
-    db.setConnectOptions();
+    p_db.setConnectOptions();
     QString dsn = QString("Driver={SQL Server Native Client 11.0};Server=tcp:nfclues.database.windows.net,1433;Database=NFClues_DB;Uid=%1@nfclues;Pwd=%2;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;").arg(Login).arg(Pass);
-    db.setDatabaseName(dsn);
-    if (db.open())
-    {
-      qDebug() << "DB connection opened.";
-      QSqlQuery UserFetch;
-      //Check for existing user under this email or login
-      if (UserFetch.exec(QString("select * from users where login = %1 or email = %2").arg(l_login).arg(l_email)))
-      {
-          if (UserFetch.next())
-          {
-            qDebug() << "Email or Login is taken";
-          }
-          else
-          {
-            qDebug() << "No existing record found, inserting new";
-
-            QString InsertQry = "insert into users values ((NEXT VALUE FOR user_seq),:login,:pass,:salt,:email,:points,:role,CURRENT_TIMESTAMP)";
-            QSqlQuery NewUserInsert;
-            NewUserInsert.prepare(InsertQry);
-            NewUserInsert.bindValue(":login",l_login);
-            NewUserInsert.bindValue(":pass",QString("%1").arg(QString(QCryptographicHash::hash(l_password.toUtf8(),QCryptographicHash::Sha1).toHex())));    //Method 2 - SHA-1 hash
-            NewUserInsert.bindValue(":salt",123);   //Hash is not salted yet
-            NewUserInsert.bindValue(":email",l_email);
-            NewUserInsert.bindValue(":role",1);     //Role 1 is normal user
-
-            if (NewUserInsert.exec())
-            {
-                qDebug() << "Inserted";
-            }
-            else
-            {
-              qDebug() << "Error happened - " << db.lastError().text();
-            }
-          }
-      }
-      else
-      {
-
-      }
-      qDebug() << "Closing connection";
-      db.close();
-    }
-    else
-    {
-      qDebug() << "Error happened - " << db.lastError().text();
-    }
+    p_db.setDatabaseName(dsn);
+    return p_db;
 }

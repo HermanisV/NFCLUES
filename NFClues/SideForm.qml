@@ -2,29 +2,51 @@ import QtQuick 2.5
 import QtQuick.Window 2.0
 import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
+import NFCUser 0.1
+import QtQuick.Dialogs 1.2
 
 Item {
+    id: itmSideForm
     width: Screen.width * 0.8
-    height: Screen.height
-    anchors.left: parent
-
-    property string btnCommitText : "Login"
-    property alias btnCommit: btnCommit
+    height: flcmain.height
+    //property alias btnCommit: btnCommit
+    property string errorString
+    property bool userOK: false
 
     Rectangle {
-        id: rectangle1
-        width: Screen.width * 0.8
-        height: parent.height
+        anchors.fill: parent
         color: "lightgray"
+        TabView {
+            visible: !userOK
+            width: Screen.width * 0.8
+            height: flcmain.height
+            id: newTabView
+            Tab {
+                title: "Register"
+                Register { anchors.fill: parent }
+            }
 
-        Button {
-            id: btnCommit
-            x: parent.width * 0.65
-            y: parent.height *  0.75
-            width: parent.width * 0.30
-            height: parent.height * 0.10
-            text: btnCommitText
+            Tab {
+                title: "Login"
+                Login { anchors.fill: parent }
+            }
         }
+        TabView {
+            visible: userOK
+            width: Screen.width * 0.8
+            height: flcmain.height
+            id: logTabView
+            Tab {
+                title: "User"
+            }
 
+            Tab {
+                title: "Adventures"
+            }
+
+            Tab {
+                title: "Leaderboards"
+            }
+        }
     }
 }

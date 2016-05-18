@@ -1,3 +1,6 @@
+OTHER_FILES +=\
+
+
 unix:!android {
     isEmpty(target.path) {
         qnx {
