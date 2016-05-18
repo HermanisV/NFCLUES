@@ -106,17 +106,17 @@ void UserHandler::createNewUser()
                 qDebug() << "No existing record found, inserting new";
                 QString InsertQry = QString("insert into users values ((NEXT VALUE FOR user_seq),'%1',HASHBYTES( 'MD5','%2'),123,'%3',0,1,CURRENT_TIMESTAMP)").arg(l_login).arg(l_password).arg(l_email);
                 QSqlQuery NewUserInsert;
-//                NewUserInsert.prepare(InsertQry);
-//                NewUserInsert.bindValue(":login",l_login);
-//                NewUserInsert.bindValue(":pass",l_password);
-//                NewUserInsert.bindValue(":salt",123);   //Hash is not salted yet
-//                NewUserInsert.bindValue(":email",l_email);
-//                NewUserInsert.bindValue(":role",1);     //Role 1 is normal user
-
                 if (NewUserInsert.exec(InsertQry))
                 {
                     qDebug() << "Inserted";
+                    db.close();
+                    if (getUserData(l_login))
+                    {
+                    qDebug() << "Got Logon data";
                     emit gotLogin();
+                    qDebug() << "Back from loginUser";
+                    return;
+                    }
                 }
                 else
                 {
@@ -155,7 +155,6 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
         QSqlQuery UserFetch;
         //Check for existing user under this login pass combination
         QString user_query = QString("select * from users where login = '%1' and PasswordHash = HASHBYTES( 'MD5','%2')").arg(p_login).arg(p_pass);
-        qDebug() << "Querry "<< user_query;
         if (UserFetch.exec(user_query))
         {
             if (UserFetch.next()) {
@@ -174,22 +173,25 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
                 //                if(md5_generator.result().toHex() == oldPass){
 
                 qDebug() << "Password match";
-                l_userId = UserFetch.value(0).toInt();
-                l_login  = UserFetch.value(1).toString();
-                l_email  = UserFetch.value(4).toString();
-                l_points = UserFetch.value(5).toInt();
-                l_role   = UserFetch.value(6).toInt();
+                db.close();
                 emit gotLogin();
             }
             //                }
             else
             {//PW don't match
                 qDebug() << "Login and pass combination is incorrect";
-                qDebug() << "Error happened - " << db.lastError().text();
                 qDebug() << "Closing connection";
                 db.close();
                 gotError("Wrong login");
             }
+        }
+        else
+        {
+            qDebug() << "Error happened - " << db.lastError().text();
+            qDebug() << "Closing connection";
+            db.close();
+            gotError("Ooops, there seems to be a problem");
+        }
     }
     else
     {
@@ -199,41 +201,84 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
         gotError("Ooops, there seems to be a problem");
     }
 }
-else
-{
-qDebug() << "Error happened - " << db.lastError().text();
-qDebug() << "Closing connection";
-db.close();
-gotError("Ooops, there seems to be a problem");
-}
-}
 
-void UserHandler::handleError(QString p_error)
+bool UserHandler::getUserData(QString p_login)
 {
-    qDebug() << "Error happened";
-    if (p_error == l_error)
+    qDebug() << "In UserHandler.getUserData";
+    QSqlDatabase db = connectDb();
+    if (db.open())
     {
-        return;
+        qDebug() << "DB connection opened.";
+        QSqlQuery userFullFetch;
+        //Fetch full user data by id
+        QString user_query = QString("select * from users where login = '%1'").arg(p_login);
+        qDebug() << "Querry "<< user_query;
+        if (userFullFetch.exec(user_query))
+        {
+            if (userFullFetch.next()) {
+                qDebug() << "User by id found";
+                l_userId = userFullFetch.value(0).toInt();
+                l_login  = userFullFetch.value(1).toString();
+                l_email  = userFullFetch.value(4).toString();
+                l_points = userFullFetch.value(5).toInt();
+                l_role   = userFullFetch.value(6).toInt();
+
+                qDebug() << "l_login "<< l_login;
+                qDebug() << "l_userId "<< l_userId;
+                qDebug() << "l_email "<< l_email;
+                qDebug() << "l_points "<< l_points;
+                qDebug() << "l_role "<< l_role;
+                db.close();
+                return true;
+            }
+            else{
+                qDebug() << "User under login "<< p_login<< " was not found, or something went wrong";
+                qDebug() << "Error happened - " << db.lastError().text();
+                qDebug() << "Closing connection";
+                db.close();
+                gotError("Wrong login");
+                return false;
+            }
+        }
+        else
+        {
+            qDebug() << "Error happened - " << db.lastError().text();
+            qDebug() << "Closing connection";
+            db.close();
+            gotError("Ooops, there seems to be a problem");
+            return false;
+        }
+        return false;
     }
-    else
+   return false;
+}
+
+    void UserHandler::handleError(QString p_error)
     {
-        l_error = p_error;
-        emit error();
+        qDebug() << "Error happened";
+        if (p_error == l_error)
+        {
+            return;
+        }
+        else
+        {
+            l_error = p_error;
+            emit error();
+        }
     }
-}
 
-QSqlDatabase UserHandler::connectDb()
-{
-    qDebug() << "In UserHandler.connectDb";
-    //Server and DB variables
-    QString ServerName = "nfclues";
-    QString DBName = "NFClues_DB";
-    QString Login = "verhoher";
-    QString Pass = "Vietejais3Brown";
-    QSqlDatabase p_db = QSqlDatabase::addDatabase("QODBC3");
+    QSqlDatabase UserHandler::connectDb()
+    {
+        qDebug() << "In UserHandler.connectDb";
+        //Server and DB variables
+        QString ServerName = "nfclues";
+        QString DBName = "NFClues_DB";
+        QString Login = "verhoher";
+        QString Pass = "Vietejais3Brown";
+        QSqlDatabase p_db = QSqlDatabase::addDatabase("QODBC3");
 
-    p_db.setConnectOptions();
-    QString dsn = QString("Driver={SQL Server Native Client 11.0};Server=tcp:nfclues.database.windows.net,1433;Database=NFClues_DB;Uid=%1@nfclues;Pwd=%2;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;").arg(Login).arg(Pass);
-    p_db.setDatabaseName(dsn);
-    return p_db;
-}
+        p_db.setConnectOptions();
+        QString dsn = QString("Driver={SQL Server Native Client 11.0};Server=tcp:nfclues.database.windows.net,1433;Database=NFClues_DB;Uid=%1@nfclues;Pwd=%2;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;").arg(Login).arg(Pass);
+        p_db.setDatabaseName(dsn);
+        return p_db;
+    }

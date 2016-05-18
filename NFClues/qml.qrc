@@ -4,5 +4,6 @@
         <file>SideForm.qml</file>
         <file>Register.qml</file>
         <file>Login.qml</file>
+        <file>User.qml</file>
     </qresource>
 </RCC>

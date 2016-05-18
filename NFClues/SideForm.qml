@@ -38,6 +38,12 @@ Item {
             id: logTabView
             Tab {
                 title: "User"
+                User {
+                   anchors.fill: parent
+                   mainUserLogin  : mainUserHandle.login
+                   mainUserPlace  : 1
+                   mainUserPoints : mainUserHandle.points
+                }
             }
 
             Tab {
@@ -48,5 +54,15 @@ Item {
                 title: "Leaderboards"
             }
         }
+    }
+    HandleUser{
+        id: mainUserHandle
+        onError: {
+            console.log("There was an Error: " + errorString)
+            itmSideForm.userOK = false
+        }
+//        onGotLogin: {
+//            itmSideForm.userOK = true
+//        }
     }
 }

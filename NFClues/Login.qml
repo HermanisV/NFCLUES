@@ -48,17 +48,7 @@ Rectangle {
         height: Screen.height * 0.05
         text: qsTr("Login")
         onClicked: {
-            usrHandle.loginUser(logUserLogin.text,logUserPassword.text);
-        }
-    }
-    HandleUser{
-        id: usrHandle
-        onError: {
-            console.log("There was an Error: " + errorString)
-            itmSideForm.userOK = false
-        }
-        onGotLogin: {
-            itmSideForm.userOK = true
+            mainUserHandle.loginUser(logUserLogin.text,logUserPassword.text);
         }
     }
 }

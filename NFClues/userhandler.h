@@ -54,6 +54,7 @@ public:
     //Methods
     Q_INVOKABLE void  createNewUser();
     Q_INVOKABLE void  loginUser(QString p_login, QString p_pass);
+    Q_INVOKABLE bool  getUserData(QString p_login);
 
     //Signals
 signals:

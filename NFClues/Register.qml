@@ -68,20 +68,11 @@ Rectangle {
         height: Screen.height * 0.05
         text: qsTr("Register")
         onClicked: {
-            usrHandle.login = userLogin.text
-            usrHandle.email = userEmail.text
-            usrHandle.password = userPassword.text
-            usrHandle.createNewUser();
-        }
-    }
-    HandleUser{
-        id: usrHandle
-        onError: {
-            console.log("There was an Error: " + errorString)
-            itmSideForm.userOK = false
-        }
-        onGotLogin: {
-            itmSideForm.userOK = true
+            mainUserHandle.login = userLogin.text
+            mainUserHandle.email = userEmail.text
+            mainUserHandle.password = userPassword.text
+            mainUserHandle.createNewUser();
+            console.log("back from create new user")
         }
     }
 }
