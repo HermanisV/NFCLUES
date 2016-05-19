@@ -22,4 +22,5 @@ QML_IMPORT_PATH2 = C:\NFClues_builds\
 include(deployment.pri)
 
 HEADERS += \
-    userhandler.h
+    userhandler.h \
+    nfdb.h

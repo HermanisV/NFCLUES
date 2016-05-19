@@ -75,8 +75,9 @@ private:
     int     l_points;
     int     l_role;
     QString l_error;
+    QSqlDatabase l_db;
 
-    QSqlDatabase connectDb();
+    void createDb();
 };
 
 #endif // USERHANDLER_H

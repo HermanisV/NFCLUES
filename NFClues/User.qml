@@ -41,7 +41,7 @@ Rectangle {
             id: usrPoints
             x: 70
             y: 210
-           // text: (qsTr("Your points: ") + mainUserPoints)
+            text: (qsTr("Your points: ") + mainUserPoints)
             font.pixelSize: 36
         }
 
@@ -49,7 +49,7 @@ Rectangle {
             id: usrPlace
             x: 70
             y: 272
-           // text: (qsTr("Which places you: ") + mainUserPlace)
+            text: (qsTr("Which places you: ") + mainUserPlace)
             font.pixelSize: 36
         }
 }

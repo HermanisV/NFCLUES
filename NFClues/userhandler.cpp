@@ -12,6 +12,7 @@
 UserHandler::UserHandler(QObject *parent) : QObject(parent)
 {
     connect(this,SIGNAL(gotError(QString)), this,SLOT(handleError(QString)));
+    createDb();
 }
 
 int UserHandler::userId()
@@ -85,9 +86,8 @@ void UserHandler::setRole(const int &role)
 void UserHandler::createNewUser()
 {
     qDebug() << "In UserHandler.createNewUser";
-    QSqlDatabase db = connectDb();
 
-    if (db.open())
+    if (l_db.open())
     {
         qDebug() << "DB connection opened.";
         QSqlQuery UserFetch;
@@ -98,7 +98,7 @@ void UserHandler::createNewUser()
         {
             if (UserFetch.next()) {
                 qDebug() << "Login taken";
-                db.close();
+                l_db.close();
                 gotError("Email or Login is taken");
             }
             else
@@ -109,7 +109,7 @@ void UserHandler::createNewUser()
                 if (NewUserInsert.exec(InsertQry))
                 {
                     qDebug() << "Inserted";
-                    db.close();
+                    l_db.close();
                     if (getUserData(l_login))
                     {
                     qDebug() << "Got Logon data";
@@ -120,26 +120,26 @@ void UserHandler::createNewUser()
                 }
                 else
                 {
-                    qDebug() << "Error happened - " << db.lastError().text();
+                    qDebug() << "Error happened - " << l_db.lastError().text();
                     qDebug() << "Closing connection";
-                    db.close();
+                    l_db.close();
                     gotError("Ooops, there seems to be a problem");
                 }
             }
         }
         else
         {
-            qDebug() << "Error happened - " << db.lastError().text();
+            qDebug() << "Error happened - " << l_db.lastError().text();
             qDebug() << "Closing connection";
-            db.close();
+            l_db.close();
             gotError("Ooops, there seems to be a problem");
         }
     }
     else
     {
-        qDebug() << "Error happened - " << db.lastError().text();
+        qDebug() << "Error happened - " << l_db.lastError().text();
         qDebug() << "Closing connection";
-        db.close();
+        l_db.close();
         gotError("Ooops, there seems to be a problem");
     }
 }
@@ -147,11 +147,9 @@ void UserHandler::createNewUser()
 void UserHandler::loginUser(QString p_login, QString p_pass)
 {
     qDebug() << "In UserHandler.loginUser";
-    QSqlDatabase db = connectDb();
-
-    if (db.open())
+    if (l_db.open())
     {
-        qDebug() << "DB connection opened.";
+        qDebug() << "l_db connection opened.";
         QSqlQuery UserFetch;
         //Check for existing user under this login pass combination
         QString user_query = QString("select * from users where login = '%1' and PasswordHash = HASHBYTES( 'MD5','%2')").arg(p_login).arg(p_pass);
@@ -159,45 +157,38 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
         {
             if (UserFetch.next()) {
                 qDebug() << "Login user found";
-                //                QCryptographicHash md5_generator(QCryptographicHash::Md5);
-                //                md5_generator.addData(p_pass.toLocal8Bit(),64);
-                //                qDebug() << md5_generator.result().toHex();
-                //                QCryptographicHash md5Generator(QCryptographicHash::Md5);
-                //                md5Generator.addData(p_pass.toLocal8Bit(),64);
-                //                QByteArrayData passHash = md5Generator.result().toHex();
-
-                //               // QByteArray passHash = QCryptographicHash::hash(p_pass.toLocal8Bit(),QCryptographicHash::Md5).toHex();
-                //                QByteArray oldPass = UserFetch.value(2).toByteArray().toHex();
-                //                qDebug()<< "New hash "<< md5_generator.result().toHex();
-                //                qDebug()<< "Old hash "<< oldPass;
-                //                if(md5_generator.result().toHex() == oldPass){
-
                 qDebug() << "Password match";
-                db.close();
+                l_db.close();
+                if (getUserData(p_login))
+                {
+                qDebug() << "Got Logon data";
                 emit gotLogin();
+                qDebug() << "Back from loginUser";
+                return;
+                }
             }
             //                }
             else
             {//PW don't match
                 qDebug() << "Login and pass combination is incorrect";
                 qDebug() << "Closing connection";
-                db.close();
+                l_db.close();
                 gotError("Wrong login");
             }
         }
         else
         {
-            qDebug() << "Error happened - " << db.lastError().text();
+            qDebug() << "Error happened - " << l_db.lastError().text();
             qDebug() << "Closing connection";
-            db.close();
+            l_db.close();
             gotError("Ooops, there seems to be a problem");
         }
     }
     else
     {
-        qDebug() << "Error happened - " << db.lastError().text();
+        qDebug() << "Error happened - " << l_db.lastError().text();
         qDebug() << "Closing connection";
-        db.close();
+        l_db.close();
         gotError("Ooops, there seems to be a problem");
     }
 }
@@ -205,8 +196,7 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
 bool UserHandler::getUserData(QString p_login)
 {
     qDebug() << "In UserHandler.getUserData";
-    QSqlDatabase db = connectDb();
-    if (db.open())
+    if (l_db.open())
     {
         qDebug() << "DB connection opened.";
         QSqlQuery userFullFetch;
@@ -228,23 +218,23 @@ bool UserHandler::getUserData(QString p_login)
                 qDebug() << "l_email "<< l_email;
                 qDebug() << "l_points "<< l_points;
                 qDebug() << "l_role "<< l_role;
-                db.close();
+                l_db.close();
                 return true;
             }
             else{
                 qDebug() << "User under login "<< p_login<< " was not found, or something went wrong";
-                qDebug() << "Error happened - " << db.lastError().text();
+                qDebug() << "Error happened - " << l_db.lastError().text();
                 qDebug() << "Closing connection";
-                db.close();
+                l_db.close();
                 gotError("Wrong login");
                 return false;
             }
         }
         else
         {
-            qDebug() << "Error happened - " << db.lastError().text();
+            qDebug() << "Error happened - " << l_db.lastError().text();
             qDebug() << "Closing connection";
-            db.close();
+            l_db.close();
             gotError("Ooops, there seems to be a problem");
             return false;
         }
@@ -267,7 +257,7 @@ bool UserHandler::getUserData(QString p_login)
         }
     }
 
-    QSqlDatabase UserHandler::connectDb()
+    void UserHandler::createDb()
     {
         qDebug() << "In UserHandler.connectDb";
         //Server and DB variables
@@ -275,10 +265,8 @@ bool UserHandler::getUserData(QString p_login)
         QString DBName = "NFClues_DB";
         QString Login = "verhoher";
         QString Pass = "Vietejais3Brown";
-        QSqlDatabase p_db = QSqlDatabase::addDatabase("QODBC3");
-
-        p_db.setConnectOptions();
+        l_db = QSqlDatabase::addDatabase("QODBC3");
+        l_db.setConnectOptions();
         QString dsn = QString("Driver={SQL Server Native Client 11.0};Server=tcp:nfclues.database.windows.net,1433;Database=NFClues_DB;Uid=%1@nfclues;Pwd=%2;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;").arg(Login).arg(Pass);
-        p_db.setDatabaseName(dsn);
-        return p_db;
+        l_db.setDatabaseName(dsn);
     }
