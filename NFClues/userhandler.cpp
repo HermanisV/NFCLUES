@@ -1,18 +1,22 @@
 #include "userhandler.h"
+#include "leaderboarddata.h"
 #include <QDebug>
 #include <QObject>
 #include <QQuickItem>
 #include <QString>
 #include <QtCore>
 #include <QtSql>
-#include <QQmlContext>
 #include <QErrorMessage>
-#include <QCryptographicHash>
+#include <QtQml>
+#include <QTableView>
+#include "qqml.h"
+#include "nfcdb.h"
+#include <QtQuick/qquickview.h>
 
 UserHandler::UserHandler(QObject *parent) : QObject(parent)
 {
     connect(this,SIGNAL(gotError(QString)), this,SLOT(handleError(QString)));
-    createDb();
+    connect(this,SIGNAL(gotLogin()), this,SLOT(buildLeaderboard()));
 }
 
 int UserHandler::userId()
@@ -50,6 +54,16 @@ QString UserHandler::errorString()
     return l_error;
 }
 
+int UserHandler::place()
+{
+    return l_place;
+}
+
+QList<QObject *> UserHandler::leaderTable()
+{
+    return l_leaderTable;
+}
+
 void UserHandler::setUserId(const int &userId)
 {
     if (l_userId == userId)
@@ -60,37 +74,73 @@ void UserHandler::setUserId(const int &userId)
 
 void UserHandler::setLogin(const QString &login)
 {
-    l_login = login;
+    if (login == l_login)
+    {
+        return;
+    }
+    else
+    {
+        l_login = login;
+    }
 }
 
 void UserHandler::setEmail(const QString &email)
 {
-    l_email = email;
+    if (email == l_email)
+    {
+        return;
+    }
+    else
+    {
+        l_email = email;
+    }
 }
 
 void UserHandler::setPassword(const QString &password)
 {
-    l_password = password;
+    if (password == l_password)
+    {
+        return;
+    }
+    else
+    {
+        l_password = password;
+    }
 }
 
 void UserHandler::setPoints(const int &points)
 {
-    l_points = points;
+    if (points == l_points)
+    {
+        return;
+    }
+    else
+    {
+        l_points = points;
+    }
 }
 
 void UserHandler::setRole(const int &role)
 {
-    l_role = role;
+    if (role == l_role)
+    {
+        return;
+    }
+    else
+    {
+        l_role = role;
+    }
 }
 
 void UserHandler::createNewUser()
 {
     qDebug() << "In UserHandler.createNewUser";
-
+    NfcDb DB;
+    l_db = DB.getDB();
     if (l_db.open())
     {
         qDebug() << "DB connection opened.";
-        QSqlQuery UserFetch;
+        QSqlQuery UserFetch(l_db);
         //Check for existing user under this email or login
         QString user_query = QString("select * from users where login = '%1' or email = '%2'").arg(l_login).arg(l_email);
         qDebug() << "Querry "<< user_query;
@@ -105,17 +155,17 @@ void UserHandler::createNewUser()
             {
                 qDebug() << "No existing record found, inserting new";
                 QString InsertQry = QString("insert into users values ((NEXT VALUE FOR user_seq),'%1',HASHBYTES( 'MD5','%2'),123,'%3',0,1,CURRENT_TIMESTAMP)").arg(l_login).arg(l_password).arg(l_email);
-                QSqlQuery NewUserInsert;
+                QSqlQuery NewUserInsert(l_db);
                 if (NewUserInsert.exec(InsertQry))
                 {
                     qDebug() << "Inserted";
                     l_db.close();
                     if (getUserData(l_login))
                     {
-                    qDebug() << "Got Logon data";
-                    emit gotLogin();
-                    qDebug() << "Back from loginUser";
-                    return;
+                        qDebug() << "Got Logon data";
+                        emit gotLogin();
+                        qDebug() << "Back from loginUser";
+                        return;
                     }
                 }
                 else
@@ -147,10 +197,12 @@ void UserHandler::createNewUser()
 void UserHandler::loginUser(QString p_login, QString p_pass)
 {
     qDebug() << "In UserHandler.loginUser";
+    NfcDb DB;
+    l_db = DB.getDB();
     if (l_db.open())
     {
         qDebug() << "l_db connection opened.";
-        QSqlQuery UserFetch;
+        QSqlQuery UserFetch(l_db);
         //Check for existing user under this login pass combination
         QString user_query = QString("select * from users where login = '%1' and PasswordHash = HASHBYTES( 'MD5','%2')").arg(p_login).arg(p_pass);
         if (UserFetch.exec(user_query))
@@ -161,10 +213,10 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
                 l_db.close();
                 if (getUserData(p_login))
                 {
-                qDebug() << "Got Logon data";
-                emit gotLogin();
-                qDebug() << "Back from loginUser";
-                return;
+                    qDebug() << "Got Logon data";
+                    emit gotLogin();
+                    qDebug() << "Back from loginUser";
+                    return;
                 }
             }
             //                }
@@ -196,12 +248,14 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
 bool UserHandler::getUserData(QString p_login)
 {
     qDebug() << "In UserHandler.getUserData";
+    NfcDb DB;
+    l_db = DB.getDB();
     if (l_db.open())
     {
         qDebug() << "DB connection opened.";
-        QSqlQuery userFullFetch;
+        QSqlQuery userFullFetch(l_db);
         //Fetch full user data by id
-        QString user_query = QString("select * from users where login = '%1'").arg(p_login);
+        QString user_query = QString("SELECT us.*, rowus.Place from users us,(SELECT ROW_NUMBER() OVER (ORDER BY points desc) AS Place, login,Points FROM users) rowus where rowus.Login = us.Login and   us.login = '%1'").arg(p_login);
         qDebug() << "Querry "<< user_query;
         if (userFullFetch.exec(user_query))
         {
@@ -212,12 +266,14 @@ bool UserHandler::getUserData(QString p_login)
                 l_email  = userFullFetch.value(4).toString();
                 l_points = userFullFetch.value(5).toInt();
                 l_role   = userFullFetch.value(6).toInt();
+                l_place  = userFullFetch.value(8).toInt();
 
                 qDebug() << "l_login "<< l_login;
                 qDebug() << "l_userId "<< l_userId;
                 qDebug() << "l_email "<< l_email;
                 qDebug() << "l_points "<< l_points;
                 qDebug() << "l_role "<< l_role;
+                qDebug() << "l_place "<< l_place;
                 l_db.close();
                 return true;
             }
@@ -240,33 +296,58 @@ bool UserHandler::getUserData(QString p_login)
         }
         return false;
     }
-   return false;
+    return false;
 }
 
-    void UserHandler::handleError(QString p_error)
+void UserHandler::handleError(QString p_error)
+{
+    qDebug() << "Error happened";
+    if (p_error == l_error)
     {
-        qDebug() << "Error happened";
-        if (p_error == l_error)
+        return;
+    }
+    else
+    {
+        l_error = p_error;
+        emit error();
+    }
+}
+
+void UserHandler::buildLeaderboard()
+{
+    qDebug() << "In UserHandler.handleLeaderboard";
+    NfcDb DB;
+    l_db = DB.getDB();
+
+    if (l_db.open())
+    {
+        qDebug() << "DB connection opened.";
+        QSqlQuery leaderFetch(l_db);
+        //Fetch data to be filled in  leaderboardData model
+        QString leader_query = QString("SELECT rowus.place ,us.login,us.Points from users us,(SELECT ROW_NUMBER() OVER (ORDER BY points desc) AS place,login FROM users) rowus where rowus.Place < 101 and rowus.login = us.login order by rowus.Place asc, Points desc, login asc;");
+        qDebug() << "Querry "<< leader_query;
+        if (leaderFetch.exec(leader_query))
         {
-            return;
+            while (leaderFetch.next()) {
+                l_leaderTable.append(new LeaderboardData(leaderFetch.value(0).toInt(), leaderFetch.value(1).toString(),leaderFetch.value(2).toInt()));
+                 qDebug() << "Querry  got user: "<<leaderFetch.value(1).toString();
+            }
+            l_db.close();
         }
         else
         {
-            l_error = p_error;
-            emit error();
+            qDebug() << "Error happened - " << l_db.lastError().text();
+            qDebug() << "Closing connection";
+            l_db.close();
+            gotError("Ooops, there seems to be a problem");
         }
     }
-
-    void UserHandler::createDb()
-    {
-        qDebug() << "In UserHandler.connectDb";
-        //Server and DB variables
-        QString ServerName = "nfclues";
-        QString DBName = "NFClues_DB";
-        QString Login = "verhoher";
-        QString Pass = "Vietejais3Brown";
-        l_db = QSqlDatabase::addDatabase("QODBC3");
-        l_db.setConnectOptions();
-        QString dsn = QString("Driver={SQL Server Native Client 11.0};Server=tcp:nfclues.database.windows.net,1433;Database=NFClues_DB;Uid=%1@nfclues;Pwd=%2;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;").arg(Login).arg(Pass);
-        l_db.setDatabaseName(dsn);
-    }
+    qDebug() << "Done fetching";
+//    //Leaderboard
+//    QQuickView view;
+//    view.setResizeMode(QQuickView::SizeRootObjectToView);
+//    QQmlContext *ctxt = view.rootContext();
+//    ctxt->setContextProperty("LeaderboardModel", QVariant::fromValue(l_leaderTable));
+//    view.setSource(QUrl("qrc:/Views/Leaderboards.qml"));
+//    //view.show();
+}

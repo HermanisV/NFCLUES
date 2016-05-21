@@ -34,7 +34,7 @@ Rectangle {
             anchors.top: parent.top
             anchors.topMargin: 45
             text: mainUserLogin
-            font.pixelSize: 36
+            font.pixelSize: 42
         }
 
         Text {

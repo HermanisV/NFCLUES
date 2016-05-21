@@ -4,6 +4,9 @@ import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
 import NFCUser 0.1
 import QtQuick.Dialogs 1.2
+import "Forms"
+import "Views"
+import "Items"
 
 Item {
     id: itmSideForm
@@ -16,6 +19,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: "lightgray"
+        Loader { id: leaderboardLoader }
         TabView {
             visible: !userOK
             width: Screen.width * 0.8
@@ -41,17 +45,24 @@ Item {
                 User {
                    anchors.fill: parent
                    mainUserLogin  : mainUserHandle.login
-                   mainUserPlace  : 1
+                   mainUserPlace  : mainUserHandle.place
                    mainUserPoints : mainUserHandle.points
                 }
             }
 
             Tab {
-                title: "Adventures"
+                title: "Create adventures"
+                CreateAdventures{ anchors.fill: parent }
+            }
+
+            Tab {
+                title: "Your Adventures"
+                YourAdventures{ anchors.fill: parent }
             }
 
             Tab {
                 title: "Leaderboards"
+                Leaderboards{ anchors.fill: parent }
             }
         }
     }

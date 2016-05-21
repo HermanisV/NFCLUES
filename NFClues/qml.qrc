@@ -2,8 +2,15 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>SideForm.qml</file>
-        <file>Register.qml</file>
-        <file>Login.qml</file>
-        <file>User.qml</file>
+        <file>helper.js</file>
+        <file>Items/MapComponent.qml</file>
+        <file>Items/SeeAdventure.qml</file>
+        <file>Items/User.qml</file>
+        <file>Forms/CreateAdventures.qml</file>
+        <file>Forms/Register.qml</file>
+        <file>Forms/Login.qml</file>
+        <file>Views/Leaderboards.qml</file>
+        <file>Views/YourAdventures.qml</file>
+        <file>Items/marker.png</file>
     </qresource>
 </RCC>

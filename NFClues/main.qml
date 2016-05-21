@@ -2,8 +2,17 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.0
 import QtQuick.Dialogs 1.2
+import "Items"
 
 ApplicationWindow {
+
+    function showMap()
+    {
+        push({ item: Qt.resolvedUrl("Items/MapComponent.qml") ,
+                 properties: { "anchors.fill": parent }
+             })
+    }
+
     title: qsTr("NFClues")
     //Props
     property string btnCommitMessage: "Loged On"
@@ -30,17 +39,23 @@ ApplicationWindow {
     // Take this into account when mapping in this element
     Flickable {
         id: flcmain
-        //anchors.left: parent
         boundsBehavior: Flickable.StopAtBounds
         width:  Screen.width
         height: Screen.height
         contentHeight: Screen.height
         contentWidth: Screen.width * 1.75
         SideForm {
+            id: sideformMain
             x: Screen.width *0.95
             y: 0
-            //btnCommit.onClicked: messageDialog.show(btnCommitMessage)
-            //btnCommitText: "Login"
+        }
+        Rectangle{
+            id: rctMap
+            anchors.left: parent.left
+            anchors.leftMargin: 0
+            MapComponent{
+                anchors.fill:parent
+            }
         }
     }
     MessageDialog {
