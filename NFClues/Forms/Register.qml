@@ -72,7 +72,7 @@ Rectangle {
             mainUserHandle.email = userEmail.text
             mainUserHandle.password = userPassword.text
             mainUserHandle.createNewUser();
-            console.log("back from create new user")
+            mainUserHandle.loading = false
         }
     }
 }

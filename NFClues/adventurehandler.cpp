@@ -2,11 +2,8 @@
 #include <QObject>
 #include <QtCore>
 #include <QtSql>
-#include <QTextStream>
 #include <QtDebug>
 #include <QString>
-#include <QStringList>
-#include <QQmlContext>
 
 
 AdventureHandler::AdventureHandler(QObject *parent) : QObject(parent)
@@ -182,6 +179,122 @@ void AdventureHandler::setStatus(const int &status)
     else
     {
         l_status = status;
+    }
+}
+
+void AdventureHandler::createNewAdventure(const int ownerId)
+{
+    qDebug() << "In AdventureHandler.createNewAdventure";
+
+    NfcDb DB;
+    l_db = DB.getDB();
+    if (l_db.open())
+    {
+        qDebug() << "DB connection opened.";
+        QSqlQuery adventureFetch(l_db);
+        //Check for existing user under this email or login
+        QString adventureQuerry = QString("select ad.Adventure_id from adventures ad, Users us where ad.Name = '%1' ad.Owner_id = %2;").arg(l_name).arg(ownerId);
+        qDebug() << "Querry "<< adventureQuerry;
+        if (adventureFetch.exec(adventureQuerry))
+        {
+            if (adventureFetch.next()) {
+                qDebug() << "Already an adventure with this name under this user";
+                l_db.close();
+                gotError("Sorry, you already have an adventure under this name");
+            }
+            else
+            {
+                qDebug() << "No existing record found, inserting new";
+                //Get adventure_id for thios adventure and ctore it on this object
+                if (adventureFetch.exec("select (NEXT VALUE FOR adventure_seq);"))
+                {
+                    l_adventureId = adventureFetch.value(0).toInt();
+                }
+                else
+                {
+                    qDebug() << "Error happened - " << l_db.lastError().text();
+                    qDebug() << "Closing connection";
+                    l_db.close();
+                    gotError("Ooops, there seems to be a problem");
+                }
+                QString InsertQry = QString("insert into Adventures values (%1,%2,'','%3','%4','%5',%6,'','',1,CURRENT_TIMESTAMP);").arg(l_adventureId).arg(ownerId).arg(l_name).arg(l_desc).arg(l_clue).arg(l_award);
+                qDebug() << "Insert: "<<InsertQry;
+                QSqlQuery NewAdventureInsert(l_db);
+                if (NewAdventureInsert.exec(InsertQry))
+                {
+                    qDebug() << "Inserted";
+                    l_db.close();
+                }
+                else
+                {
+                    qDebug() << "Error happened - " << l_db.lastError().text();
+                    qDebug() << "Closing connection";
+                    l_db.close();
+                    gotError("Ooops, there seems to be a problem");
+                }
+            }
+        }
+        else
+        {
+            qDebug() << "Error happened - " << l_db.lastError().text();
+            qDebug() << "Closing connection";
+            l_db.close();
+            gotError("Ooops, there seems to be a problem");
+        }
+    }
+    else
+    {
+        qDebug() << "Error happened - " << l_db.lastError().text();
+        qDebug() << "Closing connection";
+        l_db.close();
+        gotError("Ooops, there seems to be a problem");
+    }
+}
+
+void AdventureHandler::getAdventureData(const int p_adventureId)
+{
+    qDebug() << "In AdventureHandler.getAdventureData";
+    NfcDb DB;
+    l_db = DB.getDB();
+    if (l_db.open())
+    {
+        qDebug() << "DB connection opened.";
+        QSqlQuery adventureFullFetch(l_db);
+        //Fetch full user data by id
+        QString adventureQuery = QString("select * from Adventures where Adventure_id = %1;").arg(p_adventureId);
+        qDebug() << "Querry "<< adventureQuery;
+        if (adventureFullFetch.exec(adventureQuery))
+        {
+            if (adventureFullFetch.next()) {
+                qDebug() << "User by id found";
+                l_adventureId = adventureFullFetch.value(0).toInt();
+                l_ownerId = adventureFullFetch.value(1).toInt();
+                l_tagId = adventureFullFetch.value(2).toInt();
+                l_name = adventureFullFetch.value(3).toString();
+                l_desc = adventureFullFetch.value(4).toString();
+                l_clue = adventureFullFetch.value(5).toString();
+                l_award = adventureFullFetch.value(5).toInt();
+                l_geoLat = adventureFullFetch.value(6).toString();
+                l_geoLong = adventureFullFetch.value(7).toString();
+                l_status = adventureFullFetch.value(8).toInt();
+                l_db.close();
+                return;
+            }
+            else{
+                qDebug() << "Adventure under ID "<< p_adventureId<< " was not found, or something went wrong";
+                qDebug() << "Error happened - " << l_db.lastError().text();
+                qDebug() << "Closing connection";
+                l_db.close();
+                gotError("Adventure wasn't found");
+            }
+        }
+        else
+        {
+            qDebug() << "Error happened - " << l_db.lastError().text();
+            qDebug() << "Closing connection";
+            l_db.close();
+            gotError("Ooops, there seems to be a problem");
+        }
     }
 }
 

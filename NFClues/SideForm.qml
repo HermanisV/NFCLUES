@@ -14,14 +14,13 @@ Item {
     height: flcmain.height
     //property alias btnCommit: btnCommit
     property string errorString
-    property bool userOK: false
 
     Rectangle {
         anchors.fill: parent
         color: "lightgray"
         Loader { id: leaderboardLoader }
         TabView {
-            visible: !userOK
+            visible: !mainUserHandle.userOK
             width: Screen.width * 0.8
             height: flcmain.height
             id: newTabView
@@ -36,7 +35,7 @@ Item {
             }
         }
         TabView {
-            visible: userOK
+            visible: mainUserHandle.userOK
             width: Screen.width * 0.8
             height: flcmain.height
             id: logTabView
@@ -64,16 +63,6 @@ Item {
                 title: "Leaderboards"
                 Leaderboards{ anchors.fill: parent }
             }
-        }
-    }
-    HandleUser{
-        id: mainUserHandle
-        onError: {
-            console.log("There was an Error: " + errorString)
-            itmSideForm.userOK = false
-        }
-        onGotLogin: {
-            itmSideForm.userOK = true
         }
     }
 }

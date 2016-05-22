@@ -1,14 +1,15 @@
 #ifndef USERHANDLER_H
 #define USERHANDLER_H
 
+#include "userhandler.h"
+#include "leaderboarddata.h"
+#include <QDebug>
 #include <QObject>
-#include <QtCore>
-#include <QtSql>
-#include <QTextStream>
-#include <QtDebug>
 #include <QString>
-#include <QStringList>
-#include <QQmlContext>
+#include <QtSql>
+#include <QErrorMessage>
+#include <QtQml>
+#include "qqml.h"
 #include "leaderboarddata.h"
 #include "nfcdb.h"
 
@@ -67,6 +68,8 @@ signals:
     void gotLogin();
     void gotError(QString);
     void error();
+    void startLoading();
+    void endLoading();
 
     //Slots
 protected slots:
@@ -84,8 +87,8 @@ private:
     int     l_place;
     QString l_error;
     QSqlDatabase l_db;
-    //Public objects
     QList<QObject *>  l_leaderTable;
+    bool    l_loading;
 };
 
 #endif // USERHANDLER_H

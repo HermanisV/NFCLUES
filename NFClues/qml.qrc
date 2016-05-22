@@ -11,6 +11,13 @@
         <file>Forms/Login.qml</file>
         <file>Views/Leaderboards.qml</file>
         <file>Views/YourAdventures.qml</file>
-        <file>Items/marker.png</file>
+        <file>Resources/categories.png</file>
+        <file>Resources/left.png</file>
+        <file>Resources/marker.png</file>
+        <file>Resources/right.png</file>
+        <file>Resources/scale.png</file>
+        <file>Resources/scale_end.png</file>
+        <file>Resources/search.png</file>
+        <file>Resources/star.png</file>
     </qresource>
 </RCC>

@@ -3,19 +3,9 @@ import QtPositioning 5.5
 import QtLocation 5.6
 
 Rectangle {
-    width: 360
-    height: 640
-
-    // [Initialize Plugin]
-    Plugin {
-        id: mapPlugin
-        name: "osm"
-    }
-
-    // [Current Location]
     PositionSource {
         id: positionSource
-        property variant lastSearchPosition: locationNfcHome
+        property variant lastSearchPosition: locationOslo
         active: true
         updateInterval: 120000 // 2 mins
         onPositionChanged:  {
@@ -30,15 +20,13 @@ Rectangle {
             }
         }
     }
+    property variant locationOslo: QtPositioning.coordinate( 59.93, 10.76)
 
-    property variant locationNfcHome: QtPositioning.coordinate( 56.941488, 24.060093)
-
-    // [Places MapItemView]
     Map {
         id: map
         anchors.fill: parent
         plugin: mapPlugin;
-        center: locationNfcHome
+        center: locationOslo
         zoomLevel: 13
 
 //        MapItemView {
@@ -50,7 +38,7 @@ Rectangle {
 //                anchorPoint.y: image.height
 
 //                sourceItem: Column {
-//                    Image { id: image; source: "/Items/marker.png" }
+//                    Image { id: image; source: "marker.png" }
 //                    Text { text: title; font.bold: true }
 //                }
 //            }

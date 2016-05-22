@@ -4,16 +4,14 @@
 #include <QObject>
 #include <QtCore>
 #include <QtSql>
-#include <QTextStream>
 #include <QtDebug>
 #include <QString>
-#include <QStringList>
-#include <QQmlContext>
 #include "nfcdb.h"
 
 /* This class is used for handling all Adventure related data
  * New adventure craetion
- * Listing your adventures
+ * Creating model from your adventures
+ * Initilizing adventures
  * Fetching adventurs
  * Completing adventurs
  */
@@ -60,7 +58,8 @@ public:
     void    setStatus(const int &status);
 
     //Methods
-    //Q_INVOKABLE void  createNewAdventure();
+    Q_INVOKABLE void  createNewAdventure(const int ownerId);
+    Q_INVOKABLE void  getAdventureData(const int p_adventureId);
     //Signals
 signals:
     void adventureIdChanged();

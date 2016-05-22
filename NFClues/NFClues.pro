@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     userhandler.cpp \
     leaderboarddata.cpp \
     adventurehandler.cpp \
-    nfcdb.cpp
+    nfcdb.cpp \
+    adventureonuserdata.cpp
 
 RESOURCES += qml.qrc
 
@@ -41,7 +42,8 @@ HEADERS += \
     userhandler.h \
     leaderboarddata.h \
     adventurehandler.h \
-    nfcdb.h
+    nfcdb.h \
+    adventureonuserdata.h
 
 DISTFILES += \
     helper.js

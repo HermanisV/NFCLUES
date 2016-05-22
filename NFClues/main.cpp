@@ -6,7 +6,7 @@
 #include <QtQuick/qquickview.h>
 #include "qqml.h"
 #include "userhandler.h"
-#include "nfcdb.h"
+#include "adventurehandler.h"
 
 
 int main(int argc, char *argv[])
@@ -17,6 +17,8 @@ int main(int argc, char *argv[])
 
     //UserHandler
     qmlRegisterType<UserHandler>("NFCUser",0,1,"HandleUser");
+    //AdventureHandler
+    qmlRegisterType<AdventureHandler>("NFCAdventure",0,1,"HandleAdventure");
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 

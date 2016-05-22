@@ -2,16 +2,12 @@
 #include "leaderboarddata.h"
 #include <QDebug>
 #include <QObject>
-#include <QQuickItem>
 #include <QString>
-#include <QtCore>
 #include <QtSql>
 #include <QErrorMessage>
 #include <QtQml>
-#include <QTableView>
 #include "qqml.h"
 #include "nfcdb.h"
-#include <QtQuick/qquickview.h>
 
 UserHandler::UserHandler(QObject *parent) : QObject(parent)
 {
@@ -135,6 +131,7 @@ void UserHandler::setRole(const int &role)
 void UserHandler::createNewUser()
 {
     qDebug() << "In UserHandler.createNewUser";
+
     NfcDb DB;
     l_db = DB.getDB();
     if (l_db.open())
@@ -196,7 +193,7 @@ void UserHandler::createNewUser()
 
 void UserHandler::loginUser(QString p_login, QString p_pass)
 {
-    qDebug() << "In UserHandler.loginUser";
+    qDebug() << "In UserHandler.loginUser";   
     NfcDb DB;
     l_db = DB.getDB();
     if (l_db.open())
@@ -343,11 +340,4 @@ void UserHandler::buildLeaderboard()
         }
     }
     qDebug() << "Done fetching";
-//    //Leaderboard
-//    QQuickView view;
-//    view.setResizeMode(QQuickView::SizeRootObjectToView);
-//    QQmlContext *ctxt = view.rootContext();
-//    ctxt->setContextProperty("LeaderboardModel", QVariant::fromValue(l_leaderTable));
-//    view.setSource(QUrl("qrc:/Views/Leaderboards.qml"));
-//    //view.show();
 }
