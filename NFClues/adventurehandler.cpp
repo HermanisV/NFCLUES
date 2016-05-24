@@ -193,7 +193,7 @@ void AdventureHandler::createNewAdventure(const int ownerId)
         qDebug() << "DB connection opened.";
         QSqlQuery adventureFetch(l_db);
         //Check for existing user under this email or login
-        QString adventureQuerry = QString("select ad.Adventure_id from adventures ad, Users us where ad.Name = '%1' ad.Owner_id = %2;").arg(l_name).arg(ownerId);
+        QString adventureQuerry = QString("select ad.Adventure_id from adventures ad, Users us where ad.Name = '%1' and us.user_id = %2;").arg(l_name).arg(ownerId);
         qDebug() << "Querry "<< adventureQuerry;
         if (adventureFetch.exec(adventureQuerry))
         {
@@ -206,9 +206,12 @@ void AdventureHandler::createNewAdventure(const int ownerId)
             {
                 qDebug() << "No existing record found, inserting new";
                 //Get adventure_id for thios adventure and ctore it on this object
-                if (adventureFetch.exec("select (NEXT VALUE FOR adventure_seq);"))
+                QString advntSeqQuerry = "select (NEXT VALUE FOR adventure_seq) seq_no";
+                if (adventureFetch.exec(advntSeqQuerry))
                 {
-                    l_adventureId = adventureFetch.value(0).toInt();
+                    if (adventureFetch.next()) {
+                    setAdventureId(adventureFetch.value(0).toInt());
+                    }
                 }
                 else
                 {

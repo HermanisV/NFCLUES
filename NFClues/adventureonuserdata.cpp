@@ -9,7 +9,7 @@ AdventureOnUserData::AdventureOnUserData(QObject *parent)
 }
 
 AdventureOnUserData::AdventureOnUserData(const int &adventureId, const QString &name,const int &award,const int &status, QObject *parent)
-    : QObject(parent), l_adventureId(adventureId), l_name(name),l_award(award),l_status()
+    : QObject(parent), l_adventureId(adventureId), l_name(name),l_award(award),l_status(status)
 {
 }
 

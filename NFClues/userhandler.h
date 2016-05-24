@@ -1,8 +1,5 @@
 #ifndef USERHANDLER_H
 #define USERHANDLER_H
-
-#include "userhandler.h"
-#include "leaderboarddata.h"
 #include <QDebug>
 #include <QObject>
 #include <QString>
@@ -11,6 +8,7 @@
 #include <QtQml>
 #include "qqml.h"
 #include "leaderboarddata.h"
+#include "adventureonuserdata.h"
 #include "nfcdb.h"
 
 /* This class is used for handling all user related data.
@@ -36,6 +34,7 @@ public:
     Q_PROPERTY(QString errorString READ errorString/* NOTIFY ErrorChanged*/)
     Q_PROPERTY(int place READ place/* WRITE setPlace NOTIFY placeChanged*/)
     Q_PROPERTY(QList<QObject *> leaderTable READ leaderTable NOTIFY leaderTableChanged)
+    Q_PROPERTY(QList<QObject *> usersAdventuresTable READ usersAdventuresTable NOTIFY usersAdventuresTableChanged)
 
     //Getters
     int     userId();
@@ -48,6 +47,7 @@ public:
     int     place();
     QSqlDatabase db();
     QList<QObject *> leaderTable();
+    QList<QObject *> usersAdventuresTable();
 
     //Setters
     void    setUserId(const int &userId);
@@ -65,6 +65,7 @@ signals:
     void userIdChanged();
     void pointsChanged();
     void leaderTableChanged();
+    void usersAdventuresTableChanged();
     void gotLogin();
     void gotError(QString);
     void error();
@@ -75,6 +76,7 @@ signals:
 protected slots:
     void handleError(QString p_error);
     void buildLeaderboard();
+    void buildUsersAdventureTable(int user_id = NULL);
 
 private:
     //User data
@@ -88,6 +90,7 @@ private:
     QString l_error;
     QSqlDatabase l_db;
     QList<QObject *>  l_leaderTable;
+    QList<QObject *>  l_userAdventureTable;
     bool    l_loading;
 };
 

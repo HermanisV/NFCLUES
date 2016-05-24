@@ -13,6 +13,7 @@ UserHandler::UserHandler(QObject *parent) : QObject(parent)
 {
     connect(this,SIGNAL(gotError(QString)), this,SLOT(handleError(QString)));
     connect(this,SIGNAL(gotLogin()), this,SLOT(buildLeaderboard()));
+    connect(this,SIGNAL(gotLogin()), this,SLOT(buildUsersAdventureTable()));
 }
 
 int UserHandler::userId()
@@ -58,6 +59,11 @@ int UserHandler::place()
 QList<QObject *> UserHandler::leaderTable()
 {
     return l_leaderTable;
+}
+
+QList<QObject *> UserHandler::usersAdventuresTable()
+{
+    return l_userAdventureTable;
 }
 
 void UserHandler::setUserId(const int &userId)
@@ -312,7 +318,7 @@ void UserHandler::handleError(QString p_error)
 
 void UserHandler::buildLeaderboard()
 {
-    qDebug() << "In UserHandler.handleLeaderboard";
+    qDebug() << "In UserHandler.buildLeaderboard";
     NfcDb DB;
     l_db = DB.getDB();
 
@@ -328,6 +334,41 @@ void UserHandler::buildLeaderboard()
             while (leaderFetch.next()) {
                 l_leaderTable.append(new LeaderboardData(leaderFetch.value(0).toInt(), leaderFetch.value(1).toString(),leaderFetch.value(2).toInt()));
                  qDebug() << "Querry  got user: "<<leaderFetch.value(1).toString();
+            }
+            l_db.close();
+        }
+        else
+        {
+            qDebug() << "Error happened - " << l_db.lastError().text();
+            qDebug() << "Closing connection";
+            l_db.close();
+            gotError("Ooops, there seems to be a problem");
+        }
+    }
+    qDebug() << "Done fetching";
+}
+
+void UserHandler::buildUsersAdventureTable(int user_id)
+{
+    qDebug() << "In UserHandler.buildUsersAdventureTable";
+    if (user_id == NULL) {
+        user_id = l_userId;
+    }
+    NfcDb DB;
+    l_db = DB.getDB();
+
+    if (l_db.open())
+    {
+        qDebug() << "DB connection opened.";
+        QSqlQuery adventureFetch(l_db);
+        //Fetch data to be filled in  adventureOnUser model
+        QString adventureQuery = QString("select Adventure_id,Name,Award,Status from Adventures where Owner_id = %1;").arg(user_id);
+        qDebug() << "Querry "<< adventureQuery;
+        if (adventureFetch.exec(adventureQuery))
+        {
+            while (adventureFetch.next()) {
+                l_userAdventureTable.append(new AdventureOnUserData(adventureFetch.value(0).toInt(), adventureFetch.value(1).toString(),adventureFetch.value(2).toInt(),adventureFetch.value(3).toInt()));
+                 qDebug() << "Querry  got adventure: "<<adventureFetch.value(1).toString();
             }
             l_db.close();
         }

@@ -5,69 +5,117 @@ import QtPositioning 5.2
 import QtLocation 5.6
 import QtQuick.Window 2.0
 import NFCUser 0.1
+import NFCAdventure 0.1
 import QtQuick.Dialogs 1.2
 import "Items"
 
 ApplicationWindow {
-    id: applicationWindow1
+    id: appWindow
     title: qsTr("NFClues")
     //Props
-    property string btnCommitMessage: "Loged On"
     property bool userOK: false
+    property variant map
+    //Methods
+    function createMap()
+    {
+        var plugin
+            plugin = Qt.createQmlObject ('import QtLocation 5.3; Plugin{ name:"osm"}', appWindow)
+        if (map) {
+            map.destroy()
+        }
+
+        map = mapComponent.createObject(page);
+        map.plugin = plugin;
+        map.zoomLevel = (map.maximumZoomLevel - map.minimumZoomLevel)/2
+    }
 
     visible: true
     width:  Screen.width
     height: Screen.height
+    menuBar: mainMenu
 
-    menuBar: MenuBar {
-        id: mnbmainMenu
-        Menu {
-            title: qsTr("File")
-            MenuItem {
-
-                text: qsTr("Exit")
-                onTriggered: Qt.quit();
+    MainMenu{
+        id: mainMenu
+        Component.onCompleted: {
+            console.log("compnonent complete")
+            actionMenu.createMenu(userOK)
+            console.log("creating map")
+            createMap()
+        }
+        onSelectAction: {
+            stackView.pop({tem:page,immediate: true})
+            switch (action) {
+            case "account":
+                stackView.pop({item:page, immediate: true})
+                stackView.push({ item: Qt.resolvedUrl("Items/User.qml") ,
+                                   properties: {"mainUserLogin"  : mainUserHandle.login,
+                                       "mainUserPlace"  : mainUserHandle.place,
+                                       "mainUserPoints" : mainUserHandle.points}})
+                stackView.currentItem.closeForm.connect(stackView.closeForm)
+                break
+            case "yourAdventures":
+                stackView.pop({item:page, immediate: true})
+                stackView.push({ item: Qt.resolvedUrl("Views/YourAdventures.qml")})
+                stackView.currentItem.closeForm.connect(stackView.closeForm)
+                break
+            case "createAdventures":
+                stackView.pop({item:page, immediate: true})
+                stackView.push({ item: Qt.resolvedUrl("Forms/CreateAdventures.qml")})
+                stackView.currentItem.closeForm.connect(stackView.closeForm)
+                break
+            case "leaderboards":
+                stackView.pop({item:page, immediate: true})
+                stackView.push({ item: Qt.resolvedUrl("Views/Leaderboards.qml")})
+                stackView.currentItem.closeForm.connect(stackView.closeForm)
+                break
+            case "register":
+                stackView.pop({item:page, immediate: true})
+                stackView.push({ item: Qt.resolvedUrl("Forms/Register.qml")})
+                stackView.currentItem.closeForm.connect(stackView.closeForm)
+                stackView.currentItem.gotLogin.connect(stackView.closeForm)
+                break
+            case "login":
+                stackView.pop({item:page, immediate: true})
+                stackView.push({ item: Qt.resolvedUrl("Forms/Login.qml")})
+                stackView.currentItem.closeForm.connect(stackView.closeForm)
+                stackView.currentItem.gotLogin.connect(stackView.closeForm)
+                break
+            default:
+                console.log("Unsupported action!")
             }
         }
     }
+    //APP's structure in stackview
+    StackView {
+        id: stackView
+        anchors.fill: parent
+        focus: true
+        initialItem: Item {
+            id: page
+        }
+
+        function closeMessage(backPage)
+        {
+            pop(backPage)
+        }
+
+        function closeForm()
+        {
+            pop(page)
+        }
+    }
+
     //Map
     // Problem with determining proper height of flcmain
     // Since manuBare height cannot be read
     // so top of flcmain will be overlaid with mnbmainMenu, for now.
     // Take this into account when mapping in this element
-    Flickable {
-        id: flcmain
-        boundsBehavior: Flickable.StopAtBounds
-        width:  Screen.width
-        height: Screen.height
-        contentHeight: Screen.height
-        contentWidth: Screen.width * 1.75
-        Rectangle{
-            x:Screen.width *0.95
-            width: Screen.width * 0.75
-            height: Screen.height
-                SideForm {
-                    id: sideformMain
-                    anchors.fill: parent
-                }
-        }
-        Rectangle {
-            width: Screen.width *0.95
-            height: Screen.height
-            anchors.left: parent.left
-            anchors.leftMargin: 0
 
-            // [Initialize Plugin]
-            Plugin {
-                id: mapPlugin
-                name: "osm"
-            }
-            //! [Places MapItemView]
-            MapComponent{
-                width: parent.width
-                height: parent.height
-            }
-
+    Component {
+        id: mapComponent
+        MapComponent{
+            width: page.width
+            height: page.height
         }
     }
     HandleUser{
@@ -79,6 +127,13 @@ ApplicationWindow {
         }
         onGotLogin: {
             userOK = true
+            mainMenu.actionMenu.createMenu(userOK)
+        }
+    }
+    HandleAdventure{
+        id: thisAdvendture
+        onError: {
+            console.log("There was an Error: " + errorString)
         }
     }
 

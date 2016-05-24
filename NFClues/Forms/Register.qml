@@ -6,73 +6,125 @@ import QtQuick.Layouts 1.2
 import NFCUser 0.1
 import QtQuick.Dialogs 1.2
 
-Rectangle {
-    id: regFormRectl
-    width: Screen.width * 0.5
-    color: "lightgray"
-    ColumnLayout {
-        id: registerTab
-        width: 720
-        height: parent.height * 0.4
-        anchors.left: parent.left
-        anchors.leftMargin: 65
-        anchors.top: parent.top
-        anchors.topMargin: 45
-        TextField {
-            id: userLogin
-            Layout.fillWidth: true
-            maximumLength: 40
-            width: 420
-            height: 35
-            font.pixelSize: 36
-            placeholderText: "Username"
-        }
+Flickable{
+    signal closeForm()
+    signal gotLogin()
+    property bool userOK: false
 
-        TextField {
-            id: userEmail
-            Layout.fillWidth: true
-            maximumLength: 40
-            width: parent.width
-            height: 35
-            font.pixelSize: 36
-            placeholderText: "Email"
-        }
+    id: bigFlick
+    width: Screen.width
+    height: Screen.height
+    contentHeight: Screen.height
+    contentWidth: Screen.width + 1
+    contentX: 1
+    boundsBehavior: Flickable.OvershootBounds
+    flickableDirection: Flickable.HorizontalFlick
 
-        TextField {
-            id: userPassword
-            Layout.fillWidth: true
-            maximumLength: 40
-            width: parent.width
-            height: 35
-            font.pixelSize: 36
-            placeholderText: "Password"
-            echoMode: TextInput.PasswordEchoOnEdit
+    onFlickStarted: {
+        console.log(horizontalVelocity)
+        if (horizontalVelocity<=-700){
+            closeForm()
         }
-        TextField {
-            id: userPasswordRepeat
-            Layout.fillWidth: true
-            maximumLength: 40
-            width: parent.width
-            height: 35
-            font.pixelSize: 36
-            placeholderText: "Password again"
-            echoMode: TextInput.PasswordEchoOnEdit
-        }
+        else contentX = 1
     }
 
-    Button {
-        id: btnRegUser
-        x: registerTab.x
-        y: parent.height * 0.7
-        width: registerTab.width
-        height: Screen.height * 0.05
-        text: qsTr("Register")
-        onClicked: {
-            mainUserHandle.login = userLogin.text
-            mainUserHandle.email = userEmail.text
-            mainUserHandle.password = userPassword.text
-            mainUserHandle.createNewUser();
-            mainUserHandle.loading = false
+    Rectangle {
+
+        id: regFormRectl
+        width: Screen.width
+        height: Screen.height
+        color: "lightgray"
+        ColumnLayout {
+            id: registerTab
+            width: parent.width * 0.8
+            spacing: 35
+            anchors.left: parent.left
+            anchors.leftMargin: parent.width * 0.1
+            anchors.top: parent.top
+            anchors.topMargin: 45
+            TextField {
+                id: userLogin
+                Layout.fillWidth: true
+                maximumLength: 40
+                height: Screen.height * 0.07
+                font.pixelSize: 36
+                placeholderText: "Username"
+            }
+
+            TextField {
+                id: userEmail
+                Layout.fillWidth: true
+                maximumLength: 40
+                width: parent.width
+                height: Screen.height * 0.07
+                font.pixelSize: 36
+                placeholderText: "Email"
+            }
+
+            TextField {
+                id: userPassword
+                Layout.fillWidth: true
+                maximumLength: 40
+                width: parent.width
+                height: Screen.height * 0.07
+                font.pixelSize: 36
+                placeholderText: "Password"
+                echoMode: TextInput.PasswordEchoOnEdit
+            }
+            TextField {
+                id: userPasswordRepeat
+                Layout.fillWidth: true
+                maximumLength: 40
+                width: parent.width
+                height: Screen.height * 0.07
+                font.pixelSize: 36
+                placeholderText: "Password again"
+                echoMode: TextInput.PasswordEchoOnEdit
+            }
+        }
+        RowLayout {
+            id: btnRow
+            anchors.left: parent.left
+            anchors.leftMargin: parent.width * 0.1
+            anchors.top: registerTab.bottom
+            anchors.topMargin: 55
+            width: registerTab.width
+            height: Screen.height * 0.05
+
+            Button {
+                id: cancelButton
+                Layout.fillHeight: true
+                Layout.minimumWidth: parent.width * 0.24
+                text: qsTr("Cancel")
+                onClicked: closeForm()
+            }
+
+            Button {
+                id: clearButton
+                Layout.fillHeight: true
+                Layout.minimumWidth: parent.width * 0.24
+                text: qsTr("Clear")
+                onClicked: {
+                    userLogin.text = ""
+                    userEmail.text = ""
+                    userPassword.text = ""
+                    userPasswordRepeat.text = ""
+                }
+            }
+
+            Button {
+                id: btnLogin
+                Layout.fillHeight: true
+                Layout.minimumWidth: parent.width * 0.5
+                text: qsTr("Register")
+                onClicked: {
+                    mainUserHandle.login = userLogin.text
+                    mainUserHandle.email = userEmail.text
+                    mainUserHandle.password = userPassword.text
+                    mainUserHandle.createNewUser();
+                    gotLogin()
+                }
+            }
         }
     }
 }
