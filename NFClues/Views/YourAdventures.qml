@@ -50,23 +50,23 @@ Flickable{
             anchors.topMargin: 16
             anchors.left: parent.left
             anchors.leftMargin: parent.width * 0.1
-            TableView {
-                id:tblUsersAdventures
-                anchors.fill: parent
-                model: mainUserHandle.usersAdventuresTable
-                TableViewColumn {
-                    id: colAdventure
-                    role: "name"
-                    title: "Adventure Name"
-                    width: rctUsersAdventures.width * 0.9
-                }
-                TableViewColumn {
-                    id: colAward
-                    role: "award"
-                    title: "Award"
-                    width: rctUsersAdventures.width * 0.099
-                }
-            }
+//            TableView {
+//                id:tblUsersAdventures
+//                anchors.fill: parent
+//                //model: mainUserHandle.usersAdventuresTable
+//                TableViewColumn {
+//                    id: colAdventure
+//                    role: "name"
+//                    title: "Adventure Name"
+//                    width: rctUsersAdventures.width * 0.9
+//                }
+//                TableViewColumn {
+//                    id: colAward
+//                    role: "award"
+//                    title: "Award"
+//                    width: rctUsersAdventures.width * 0.099
+//                }
+//            }
 
             Button {
                 id: cancelButton

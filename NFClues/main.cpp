@@ -7,8 +7,6 @@
 #include "qqml.h"
 #include "userhandler.h"
 #include "adventurehandler.h"
-
-
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);

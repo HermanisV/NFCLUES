@@ -6,8 +6,11 @@
 #include <QtSql>
 #include <QErrorMessage>
 #include <QtQml>
+#include <QtQuick/qquickitem.h>
+#include <QtQuick/qquickview.h>
 #include "qqml.h"
 #include "nfcdb.h"
+#include "main.cpp"
 
 UserHandler::UserHandler(QObject *parent) : QObject(parent)
 {
