@@ -305,6 +305,12 @@ bool UserHandler::getUserData(QString p_login)
     return false;
 }
 
+void UserHandler::addAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status)
+{
+    qDebug()<<"In UserHandler.addAdventureToList";
+    l_userAdventureTable.append(new AdventureOnUserData(p_adventureId, p_name,p_award,p_status));
+    emit usersAdventuresTableChanged();
+}
 void UserHandler::handleError(QString p_error)
 {
     qDebug() << "Error happened";

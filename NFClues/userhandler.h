@@ -60,6 +60,7 @@ public:
     Q_INVOKABLE void  createNewUser();
     Q_INVOKABLE void  loginUser(QString p_login, QString p_pass);
     Q_INVOKABLE bool  getUserData(QString p_login);
+    Q_INVOKABLE void  addAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status);
     //Signals
 signals:
     void userIdChanged();

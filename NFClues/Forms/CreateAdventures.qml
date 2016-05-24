@@ -168,6 +168,8 @@ Flickable{
                     thisAdvendture.clue  = advntClue.text
                     thisAdvendture.award = advntReward.text
                     thisAdvendture.createNewAdventure(mainUserHandle.userId)
+                    mainUserHandle.addAdventureToList(thisAdvendture.adventureId, thisAdvendture.name, thisAdvendture.award, 1)
+                    createdAdventure()
                 }
             }
         }

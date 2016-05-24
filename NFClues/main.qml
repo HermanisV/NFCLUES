@@ -62,6 +62,7 @@ ApplicationWindow {
                 stackView.pop({item:page, immediate: true})
                 stackView.push({ item: Qt.resolvedUrl("Forms/CreateAdventures.qml")})
                 stackView.currentItem.closeForm.connect(stackView.closeForm)
+                stackView.currentItem.createdAdventure.connect(stackView.openAdventures)
                 break
             case "leaderboards":
                 stackView.pop({item:page, immediate: true})
@@ -102,6 +103,12 @@ ApplicationWindow {
         function closeForm()
         {
             pop(page)
+        }
+        function openAdventures()
+        {
+            stackView.pop({item:page, immediate: true})
+            stackView.push({ item: Qt.resolvedUrl("Views/YourAdventures.qml")})
+            stackView.currentItem.closeForm.connect(stackView.closeForm)
         }
     }
 
