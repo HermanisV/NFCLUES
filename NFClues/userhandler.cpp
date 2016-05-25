@@ -305,12 +305,17 @@ bool UserHandler::getUserData(QString p_login)
     return false;
 }
 
-void UserHandler::addAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status)
+void UserHandler::addAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status, QString p_desc, QString p_clue)
 {
     qDebug()<<"In UserHandler.addAdventureToList";
-    l_userAdventureTable.append(new AdventureOnUserData(p_adventureId, p_name,p_award,p_status));
+    l_userAdventureTable.append(new AdventureOnUserData(p_adventureId, p_name,p_award,p_status,p_desc,p_clue));
     emit usersAdventuresTableChanged();
 }
+
+//QVariant UserHandler::getAdventureRecord(int p_index)
+//{
+//    return QVariant::fromValue<AdventureOnUserData*>((l_userAdventureTable*)this->at(p_index));
+//}
 void UserHandler::handleError(QString p_error)
 {
     qDebug() << "Error happened";
@@ -371,12 +376,12 @@ void UserHandler::buildUsersAdventureTable(int user_id)
         qDebug() << "DB connection opened.";
         QSqlQuery adventureFetch(l_db);
         //Fetch data to be filled in  adventureOnUser model
-        QString adventureQuery = QString("select Adventure_id,Name,Award,Status from Adventures where Owner_id = %1;").arg(user_id);
+        QString adventureQuery = QString("select Adventure_id,Name,Award,Status,Description,Clue from Adventures where Owner_id = %1;").arg(user_id);
         qDebug() << "Querry "<< adventureQuery;
         if (adventureFetch.exec(adventureQuery))
         {
             while (adventureFetch.next()) {
-                l_userAdventureTable.append(new AdventureOnUserData(adventureFetch.value(0).toInt(), adventureFetch.value(1).toString(),adventureFetch.value(2).toInt(),adventureFetch.value(3).toInt()));
+                l_userAdventureTable.append(new AdventureOnUserData(adventureFetch.value(0).toInt(), adventureFetch.value(1).toString(),adventureFetch.value(2).toInt(),adventureFetch.value(3).toInt(),adventureFetch.value(4).toString(),adventureFetch.value(5).toString()));
                  qDebug() << "Querry  got adventure: "<<adventureFetch.value(1).toString();
             }
             l_db.close();

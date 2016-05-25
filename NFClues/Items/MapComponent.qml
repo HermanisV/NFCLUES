@@ -21,7 +21,6 @@ import QtLocation 5.6
 //    }
 
 Map {
-    property string mapPlugin: "osm"
     property variant locationOslo: QtPositioning.coordinate( 59.93, 10.76)
     id: map
     center: locationOslo

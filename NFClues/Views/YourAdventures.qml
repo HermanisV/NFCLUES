@@ -9,6 +9,7 @@ import QtQuick.Dialogs 1.2
 Flickable{
     signal closeForm()
     id: bigFlick
+    property variant adventureRecord
 
     width: Screen.width
     height: Screen.height
@@ -65,6 +66,18 @@ Flickable{
                     role: "award"
                     title: "Award"
                     width: rctUsersAdventures.width * 0.099
+                }
+                onClicked: {
+                    console.log("clicked to see adventure " + currentRow)
+                    console.log("adventureRecord.name " + model[currentRow].name)
+                    stackView.push({ item: Qt.resolvedUrl("../Views/SeeAdventure.qml") ,
+                                       properties: { "ownerUserLogin"  : mainUserHandle.login,
+                                           "thisAdventureName"  :   model[currentRow].name,
+                                           "thisAdventureDesc"  :   model[currentRow].desc,
+                                           "thisAdventureClue"  :   model[currentRow].clue,
+                                           "thisAdventureAward" :   model[currentRow].award,
+                                           "thisAdventureInit"  :   model[currentRow].status}})
+                    stackView.currentItem.closeForm.connect(stackView.backForm)
                 }
             }
 

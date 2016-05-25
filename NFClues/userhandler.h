@@ -57,10 +57,16 @@ public:
     void    setPoints(const int &points);
     void    setRole(const int &role);
     //Methods
+    //Registers new user
     Q_INVOKABLE void  createNewUser();
+    //Validates if login and pasword are corect
     Q_INVOKABLE void  loginUser(QString p_login, QString p_pass);
+    //Fetches and fills objects data with user under this login
     Q_INVOKABLE bool  getUserData(QString p_login);
-    Q_INVOKABLE void  addAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status);
+    //Used to add the newley created adventure to the l_userAdventureTable, s it doesn't have to be nuild a new altogether
+    Q_INVOKABLE void  addAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status, QString p_desc, QString p_clue);
+    //Used yo get data for specific slected adventure for l_userAdventureTable
+//    Q_INVOKABLE QVariant getAdventureRecord(int p_index);
     //Signals
 signals:
     void userIdChanged();

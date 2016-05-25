@@ -26,6 +26,8 @@ ApplicationWindow {
 
         map = mapComponent.createObject(page);
         map.plugin = plugin;
+        map.maximumZoomLevel = 16.75       //higher then this and map wont load sometimes
+        map.minimumZoomLevel = 3
         map.zoomLevel = (map.maximumZoomLevel - map.minimumZoomLevel)/2
     }
 
@@ -95,7 +97,7 @@ ApplicationWindow {
             id: page
         }
 
-        function closeMessage(backPage)
+        function backForm(backPage)
         {
             pop(backPage)
         }
