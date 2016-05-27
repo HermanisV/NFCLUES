@@ -76,7 +76,8 @@ Flickable{
                                            "thisAdventureDesc"  :   model[currentRow].desc,
                                            "thisAdventureClue"  :   model[currentRow].clue,
                                            "thisAdventureAward" :   model[currentRow].award,
-                                           "thisAdventureInit"  :   model[currentRow].status}})
+                                           "thisAdventureInit"  :   model[currentRow].status,
+                                           "thisAdventureId"    :   model[currentRow].adventureId}})
                     stackView.currentItem.closeForm.connect(stackView.backForm)
                 }
             }

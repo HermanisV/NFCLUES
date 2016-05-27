@@ -4,6 +4,7 @@ QT += qml quick
 QT += qml quick widgets
 QT += core
 QT += network
+QT += nfc
 QT += sql
 android{
 QT += androidextras
@@ -15,7 +16,8 @@ SOURCES += main.cpp \
     leaderboarddata.cpp \
     adventurehandler.cpp \
     nfcdb.cpp \
-    adventureonuserdata.cpp
+    adventureonuserdata.cpp \
+    nfchandler.cpp
 
 RESOURCES += qml.qrc
 
@@ -43,7 +45,8 @@ HEADERS += \
     leaderboarddata.h \
     adventurehandler.h \
     nfcdb.h \
-    adventureonuserdata.h
+    adventureonuserdata.h \
+    nfchandler.h
 
 DISTFILES += \
     helper.js

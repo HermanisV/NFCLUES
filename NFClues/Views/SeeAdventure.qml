@@ -8,6 +8,7 @@ import NFCUser 0.1
 Flickable{
     signal closeForm()
     property string ownerUserLogin
+    property int    thisAdventureId
     property string thisAdventureName
     property string thisAdventureDesc
     property string thisAdventureClue

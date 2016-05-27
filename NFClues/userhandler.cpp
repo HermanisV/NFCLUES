@@ -8,6 +8,10 @@
 #include <QtQml>
 #include <QtQuick/qquickitem.h>
 #include <QtQuick/qquickview.h>
+#include <QNetworkAccessManager>
+#include <QQmlNetworkAccessManagerFactory>
+#include <QtScript/qscriptengine.h>
+#include <QtScript/QScriptValueIterator>
 #include "qqml.h"
 #include "nfcdb.h"
 #include "main.cpp"
@@ -312,10 +316,6 @@ void UserHandler::addAdventureToList(int p_adventureId, QString p_name, int p_aw
     emit usersAdventuresTableChanged();
 }
 
-//QVariant UserHandler::getAdventureRecord(int p_index)
-//{
-//    return QVariant::fromValue<AdventureOnUserData*>((l_userAdventureTable*)this->at(p_index));
-//}
 void UserHandler::handleError(QString p_error)
 {
     qDebug() << "Error happened";

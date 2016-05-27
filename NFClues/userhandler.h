@@ -1,11 +1,14 @@
 #ifndef USERHANDLER_H
 #define USERHANDLER_H
-#include <QDebug>
 #include <QObject>
 #include <QString>
 #include <QtSql>
-#include <QErrorMessage>
+#include <QDebug>
 #include <QtQml>
+#include <QNetworkAccessManager>
+#include <QQmlNetworkAccessManagerFactory>
+#include <QtScript/qscriptengine.h>
+#include <QtScript/QScriptValueIterator>
 #include "qqml.h"
 #include "leaderboarddata.h"
 #include "adventureonuserdata.h"
@@ -98,6 +101,7 @@ private:
     QSqlDatabase l_db;
     QList<QObject *>  l_leaderTable;
     QList<QObject *>  l_userAdventureTable;
+    QNetworkAccessManager l_network;
     bool    l_loading;
 };
 
