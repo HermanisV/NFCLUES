@@ -23,6 +23,11 @@ QNdefNfcTextRecord NFCHandler::nfcText()
     return l_nfcText;
 }
 
+QNdefMessage NFCHandler::nfcMessage()
+{
+    return l_nfcMessage;
+}
+
 QString NFCHandler::errorString()
 {
     return l_error;
@@ -43,6 +48,14 @@ void NFCHandler::setNfcText(const QNdefNfcTextRecord &nfctext)
         return;
     l_nfcText = nfctext;
     emit nfcTextChanged();
+}
+
+void NFCHandler::setNfcMessage(const QNdefMessage &nfcMessage)
+{
+    if (nfcMessage == l_nfcMessage)
+        return;
+    l_nfcMessage = nfcMessage;
+    emit nfcMessageChanged();
 }
 //Methods/////////////
 /// \brief NFCHandler::startReading

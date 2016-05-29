@@ -22,7 +22,7 @@ public:
     Q_PROPERTY(int tagId READ tagId WRITE setTagId NOTIFY tagIdChanged)
     Q_PROPERTY(QNdefNfcTextRecord nfcText READ nfcText WRITE setNfcText NOTIFY nfcTextChanged)
     Q_PROPERTY(QNdefMessage nfcMessage READ nfcMessage WRITE setNfcMessage NOTIFY nfcMessageChanged)
-    Q_PROPERTY(QString errorString READ errorString NOTIFY errorChanged)
+    Q_PROPERTY(QString errorString READ errorString /*NOTIFY errorChanged*/)
 
     //Getters
     int     tagId();
@@ -33,6 +33,7 @@ public:
     //Setters
     void    setTagId(const int &tagId);
     void    setNfcText(const QNdefNfcTextRecord &nfctext);
+    void    setNfcMessage(const QNdefMessage &nfcMessage);
 
     //Methods
     Q_INVOKABLE void startReading();
