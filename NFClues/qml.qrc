@@ -16,5 +16,6 @@
         <file>Resources/scale_end.png</file>
         <file>Resources/star.png</file>
         <file>Items/MainMenu.qml</file>
+        <file>Items/MapPopup.qml</file>
     </qresource>
 </RCC>

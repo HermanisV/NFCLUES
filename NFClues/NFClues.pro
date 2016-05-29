@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     adventurehandler.cpp \
     nfcdb.cpp \
     adventureonuserdata.cpp \
-    nfchandler.cpp
+    nfchandler.cpp \
+    system.cpp
 
 RESOURCES += qml.qrc
 
@@ -46,7 +47,8 @@ HEADERS += \
     adventurehandler.h \
     nfcdb.h \
     adventureonuserdata.h \
-    nfchandler.h
+    nfchandler.h \
+    system.h
 
 DISTFILES += \
     helper.js

@@ -94,7 +94,9 @@ Flickable{
                 text: qsTr("Login")
                 onClicked: {
                     mainUserHandle.loginUser(logUserLogin.text,logUserPassword.text);
-                    gotLogin()
+                    if (mainUserHandle.userOK){
+                        gotLogin()
+                    }
                 }
             }
         }

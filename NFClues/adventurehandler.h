@@ -29,8 +29,9 @@ public:
     Q_PROPERTY(QString desc READ desc WRITE setDesc NOTIFY descChanged)
     Q_PROPERTY(QString clue READ clue WRITE setClue NOTIFY clueChanged)
     Q_PROPERTY(int award READ award WRITE setAward NOTIFY awardChanged)
-    Q_PROPERTY(QString geoLat READ geoLat WRITE setGeoLat NOTIFY geoLatChanged)
-    Q_PROPERTY(QString geoLong READ geoLong WRITE setGeoLong NOTIFY geoLongChanged)
+    Q_PROPERTY(double geoLat READ geoLat WRITE setGeoLat NOTIFY geoLatChanged)
+    Q_PROPERTY(double geoLong READ geoLong WRITE setGeoLong NOTIFY geoLongChanged)
+    Q_PROPERTY(QString errorString READ errorString NOTIFY errorChanged)
     Q_PROPERTY(int status READ status WRITE setStatus NOTIFY statusChanged)
 
     //Getters
@@ -41,8 +42,9 @@ public:
     QString desc();
     QString clue();
     int award();
-    QString geoLat();
-    QString geoLong();
+    double geoLat();
+    double geoLong();
+    QString errorString();
     int     status();
 
     //Setters
@@ -53,8 +55,8 @@ public:
     void    setDesc(const QString &desc);
     void    setClue(const QString &clue);
     void    setAward(const int &award);
-    void    setGeoLat(const QString &geoLat);
-    void    setGeoLong(const QString &geoLong);
+    void    setGeoLat(const double &geoLat);
+    void    setGeoLong(const double &geoLong);
     void    setStatus(const int &status);
 
     //Methods
@@ -71,10 +73,10 @@ signals:
     void geoLatChanged();
     void geoLongChanged();
     void statusChanged();
-
     void gotError(QString);
-    void error();
-
+    void gotAdventure();
+    void error();\
+    void errorChanged();
     //Slots
 protected slots:
     void handleError(QString p_error);
@@ -87,11 +89,12 @@ private:
     QString l_desc;
     QString l_clue;
     int l_award;
-    QString l_geoLat;
-    QString l_geoLong;
+    double l_geoLat;
+    double l_geoLong;
     int     l_status;
     QString l_error;
     QSqlDatabase l_db;
+    bool l_loading;
 
     void createDb();
 };

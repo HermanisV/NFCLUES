@@ -1,5 +1,11 @@
 .pragma library
 
+function roundNumber(number, digits)
+{
+    var multiple = Math.pow(10, digits);
+    return Math.round(number * multiple) / multiple;
+}
+
 function formatDistance(distance)
 {
     if (distance < 1000)

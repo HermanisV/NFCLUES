@@ -9,7 +9,9 @@ import QtQuick.Dialogs 1.2
 Flickable{
     signal closeForm()
     signal gotLogin()
+    signal gotError()
     property bool userOK: false
+    property string errorText
 
     id: bigFlick
     width: Screen.width
@@ -122,7 +124,9 @@ Flickable{
                     mainUserHandle.email = userEmail.text
                     mainUserHandle.password = userPassword.text
                     mainUserHandle.createNewUser();
-                    gotLogin()
+                    if (mainUserHandle.userOK){
+                        gotLogin()
+                    }
                 }
             }
         }

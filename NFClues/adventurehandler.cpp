@@ -46,14 +46,19 @@ int AdventureHandler::award()
     return l_award;
 }
 
-QString AdventureHandler::geoLat()
+double AdventureHandler::geoLat()
 {
     return l_geoLat;
 }
 
-QString AdventureHandler::geoLong()
+double AdventureHandler::geoLong()
 {
     return l_geoLong;
+}
+
+QString AdventureHandler::errorString()
+{
+    return l_error;
 }
 
 int AdventureHandler::status()
@@ -146,7 +151,7 @@ void AdventureHandler::setAward(const int &award)
     }
 }
 
-void AdventureHandler::setGeoLat(const QString &geoLat)
+void AdventureHandler::setGeoLat(const double &geoLat)
 {
     if (geoLat == l_geoLat)
     {
@@ -158,7 +163,7 @@ void AdventureHandler::setGeoLat(const QString &geoLat)
     }
 }
 
-void AdventureHandler::setGeoLong(const QString &geoLong)
+void AdventureHandler::setGeoLong(const double &geoLong)
 {
     if (geoLong == l_geoLong)
     {
@@ -188,6 +193,25 @@ void AdventureHandler::createNewAdventure(const int ownerId)
 
     NfcDb DB;
     l_db = DB.getDB();
+    //validate input
+    if (l_name == ""){
+        gotError("Pleses spicify adventure name");
+        return;
+    }
+    if (l_desc == ""){
+        gotError("Pleses spicify adventure description");\
+        return;
+    }
+    if (l_clue == ""){
+        gotError("Pleses spicify adventure clue");\
+        return;
+    }
+    if (l_award == 0 || l_award == NULL){
+        gotError("Pleses spicify adventure award");\
+        return;
+    }
+
+
     if (l_db.open())
     {
         qDebug() << "DB connection opened.";
@@ -210,7 +234,7 @@ void AdventureHandler::createNewAdventure(const int ownerId)
                 if (adventureFetch.exec(advntSeqQuerry))
                 {
                     if (adventureFetch.next()) {
-                    setAdventureId(adventureFetch.value(0).toInt());
+                        setAdventureId(adventureFetch.value(0).toInt());
                     }
                 }
                 else
@@ -227,6 +251,7 @@ void AdventureHandler::createNewAdventure(const int ownerId)
                 {
                     qDebug() << "Inserted";
                     l_db.close();
+                    emit gotAdventure();
                 }
                 else
                 {
@@ -277,8 +302,8 @@ void AdventureHandler::getAdventureData(const int p_adventureId)
                 l_desc = adventureFullFetch.value(4).toString();
                 l_clue = adventureFullFetch.value(5).toString();
                 l_award = adventureFullFetch.value(5).toInt();
-                l_geoLat = adventureFullFetch.value(6).toString();
-                l_geoLong = adventureFullFetch.value(7).toString();
+                l_geoLat = adventureFullFetch.value(6).toDouble();
+                l_geoLong = adventureFullFetch.value(7).toDouble();
                 l_status = adventureFullFetch.value(8).toInt();
                 l_db.close();
                 return;

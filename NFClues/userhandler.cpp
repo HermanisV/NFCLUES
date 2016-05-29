@@ -4,14 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QtSql>
-#include <QErrorMessage>
 #include <QtQml>
-#include <QtQuick/qquickitem.h>
-#include <QtQuick/qquickview.h>
-#include <QNetworkAccessManager>
-#include <QQmlNetworkAccessManagerFactory>
-#include <QtScript/qscriptengine.h>
-#include <QtScript/QScriptValueIterator>
 #include "qqml.h"
 #include "nfcdb.h"
 #include "main.cpp"

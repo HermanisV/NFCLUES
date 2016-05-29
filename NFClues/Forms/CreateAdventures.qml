@@ -110,7 +110,7 @@ Flickable{
                         height: parent.height
                         anchors.rightMargin: 2
                         validator: IntValidator{}
-                        placeholderText: "100"
+                        text: "0"
                         anchors.right: lblPts.left
                         font.pixelSize:24
                     }
@@ -168,8 +168,11 @@ Flickable{
                     thisAdvendture.clue  = advntClue.text
                     thisAdvendture.award = advntReward.text
                     thisAdvendture.createNewAdventure(mainUserHandle.userId)
-                    mainUserHandle.addAdventureToList(thisAdvendture.adventureId, thisAdvendture.name, thisAdvendture.award, 1,thisAdvendture.desc, thisAdvendture.clue)
-                    createdAdventure()
+                    if (thisAdvendture.adventureOk){
+                        console.log("Adventure created.")
+                        mainUserHandle.addAdventureToList(thisAdvendture.adventureId, thisAdvendture.name, thisAdvendture.award, 1,thisAdvendture.desc, thisAdvendture.clue)
+                        createdAdventure()
+                    }
                 }
             }
         }

@@ -12,6 +12,7 @@
 #include "userhandler.h"
 #include "adventurehandler.h"
 #include "nfchandler.h"
+#include  "system.h"
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -24,6 +25,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<AdventureHandler>("NFCAdventure",0,1,"HandleAdventure");
     //TagHandler
     qmlRegisterType<NFCHandler>("NFCTag",0,1,"HandleTag");
+    //TagHandler
+    qmlRegisterType<System>("ThisSystem",0,1,"System");
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 

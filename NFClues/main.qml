@@ -4,9 +4,12 @@ import QtQuick.Layouts 1.2
 import QtPositioning 5.2
 import QtLocation 5.6
 import QtQuick.Window 2.0
+import QtNfc 5.2
 import NFCUser 0.1
 import NFCAdventure 0.1
 import QtQuick.Dialogs 1.2
+import ThisSystem 0.1
+import "helper.js" as Helper
 import "Items"
 
 ApplicationWindow {
@@ -26,7 +29,7 @@ ApplicationWindow {
 
         map = mapComponent.createObject(page);
         map.plugin = plugin;
-        map.maximumZoomLevel = 16.75       //higher then this and map wont load sometimes
+        map.maximumZoomLevel = 17.5      //higher then this and map wont load tiles sometimes
         map.minimumZoomLevel = 3
         map.zoomLevel = (map.maximumZoomLevel - map.minimumZoomLevel)/2
     }
@@ -43,6 +46,7 @@ ApplicationWindow {
             actionMenu.createMenu(userOK)
             console.log("creating map")
             createMap()
+            console.log("Current env: " + thisSystem.getEnv())
         }
         onSelectAction: {
             stackView.pop({tem:page,immediate: true})
@@ -106,6 +110,7 @@ ApplicationWindow {
         {
             pop(page)
         }
+        //used to open adventure tab after creation of new adventure
         function openAdventures()
         {
             stackView.pop({item:page, immediate: true})
@@ -114,35 +119,90 @@ ApplicationWindow {
         }
     }
 
-    //Map
-    // Problem with determining proper height of flcmain
-    // Since manuBare height cannot be read
-    // so top of flcmain will be overlaid with mnbmainMenu, for now.
-    // Take this into account when mapping in this element
+    MapPopup {
+        id: mapPopup
 
+        function show(coordinate)
+        {
+            mapPopup.coordinate = coordinate
+            mapPopup.update()
+            mapPopup.popup()
+        }
+        onItemClicked: {
+            stackView.pop(page)
+            switch (item) {
+            case "getCoordinate":
+                map.coordinatesCaptured(coordinate.latitude, coordinate.longitude)
+                break
+            default:
+                console.log("Unsupported operation")
+            }
+        }
+    }
+    //Map
+    // Problem with determining proper height of mapComponent
+    // Since manuBare height cannot be read
+    // so top of mapComponent will be overlaid with mainMenu, for now.
+    // Take this into account when mapping in this element    
     Component {
         id: mapComponent
         MapComponent{
             width: page.width
             height: page.height
+
+            onShowPopupMenu: {
+                //Show Popup menu with passed current cordi
+                mapPopup.show(coordinate)
+            }
+            onCoordinatesCaptured: {
+                //Fills message to be passed for Coordinate view
+                var text = "<b>" + qsTr("Latitude:") + "</b> " + Helper.roundNumber(latitude,4) + "<br/><b>" + qsTr("Longitude:") + "</b> " + Helper.roundNumber(longitude,4)
+                showCordi.showCordi(text);
+            }
         }
     }
+    //Qobject from userhandler.h
     HandleUser{
         id: mainUserHandle
         property bool userOK: false
         property bool loading: false
         onError: {
             console.log("There was an Error: " + errorString)
+            errorDialog.showError(errorString)
         }
         onGotLogin: {
             userOK = true
             mainMenu.actionMenu.createMenu(userOK)
         }
-    }
+    }    
+    //QObject from adventurehandler.h
     HandleAdventure{
         id: thisAdvendture
+        property bool adventureOk: false
         onError: {
             console.log("There was an Error: " + errorString)
+            errorDialog.showError(errorString)
+        }
+        onGotAdventure: {
+            adventureOk = true
+        }
+    }
+    System{
+        id: thisSystem
+    }
+
+    MessageDialog {
+        id: errorDialog
+        function showError(caption) {
+            errorDialog.text = caption;
+            errorDialog.open();
+        }
+    }
+    MessageDialog {
+        id: showCordi
+        function showCordi(caption) {
+            errorDialog.text = caption;
+            errorDialog.open();
         }
     }
 
@@ -152,41 +212,3 @@ ApplicationWindow {
         running: false
     }
 }
-
-//                onErrorChanged: {
-//                    if (map.error != Map.NoError) {
-//                        var title = qsTr("ProviderError");
-//                        var message =  map.errorString + "<br/><br/><b>" + qsTr("Try to select other provider") + "</b>";
-//                        if (map.error == Map.MissingRequiredParameterError)
-//                            message += "<br/>" + qsTr("or see") + " \'mapviewer --help\' "
-//                                    + qsTr("how to pass plugin parameters.");
-//                        stackView.showMessage(title,message);
-//                    }
-
-//                MapItemView {
-//                    model: placeSearchModel
-//                    delegate: MapQuickItem {
-//                        coordinate: model.type === PlaceSearchModel.PlaceResult ? place.location.coordinate : QtPositioning.coordinate()
-
-//                        visible: model.type === PlaceSearchModel.PlaceResult
-
-//                        anchorPoint.x: image.width * 0.28
-//                        anchorPoint.y: image.height
-
-//                        sourceItem: Image {
-//                            id: image
-//                            source: "resources/marker.png"
-//                            MouseArea {
-//                                anchors.fill: parent
-//                                onClicked: stackView.showPlaceDatails(model.place,model.distance)
-//                            }
-//                        }
-//                    }
-//                }
-//    MessageDialog {
-//        id: messageDialog
-//        function show(caption) {
-//            messageDialog.text = caption;
-//            messageDialog.open();
-//        }
-//    }
