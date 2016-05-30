@@ -422,7 +422,8 @@ void AdventureHandler::initAdventure(const int p_adventureId,const int p_tagId,c
 
 void AdventureHandler::buildAdventuresOnMap()
 {
-    qDebug() << "In buildAdventuresOnMap";
+    qDebug() << "In AdventureHandler::buildAdventuresOnMap";
+
 }
 
 void AdventureHandler::handleError(QString p_error)

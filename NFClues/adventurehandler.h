@@ -103,6 +103,7 @@ private:
     QSqlDatabase l_db;
     bool l_loading;
     QList<QObject *> l_adventuresOnMap;
+    QNetworkAccessManager *l_manager;
 };
 
 
