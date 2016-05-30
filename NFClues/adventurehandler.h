@@ -8,6 +8,7 @@
 #include <QString>
 #include <QNetworkAccessManager>
 #include "nfcdb.h"
+#include "nfcnetwork.h"
 
 /* This class is used for handling all Adventure related data
  * New adventure craetion
@@ -104,7 +105,6 @@ private:
     QSqlDatabase l_db;
     bool l_loading;
     QList<QObject *> l_adventuresOnMap;
-    QNetworkAccessManager *l_manager;
 };
 
 

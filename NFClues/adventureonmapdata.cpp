@@ -8,7 +8,7 @@ AdventureOnMapData::AdventureOnMapData(QObject *parent)
 {
 }
 
-AdventureOnMapData::AdventureOnMapData(const int &adventureId, const int &tagId, const QString &name, const QString &desc, const QString &clue, const int &award, const double &geoLat, const QString &geoLong, QObject *parent)
+AdventureOnMapData::AdventureOnMapData(const int &adventureId, const int &tagId, const QString &name, const QString &desc, const QString &clue, const int &award, const double &geoLat, const double &geoLong, QObject *parent)
     : QObject(parent), l_adventureId(adventureId), l_tagId(tagId),l_name(name),l_desc(desc),l_clue(clue),l_award(award),l_geoLat(geoLat), l_geoLong(geoLong)
 {
 
@@ -19,17 +19,22 @@ int AdventureOnMapData::adventureId() const
     return l_adventureId;
 }
 
+int AdventureOnMapData::tagId() const
+{
+    return l_tagId;
+}
+
 QString AdventureOnMapData::name() const
 {
     return l_name;
 }
 
-QString AdventureOnMapData::desc()
+QString AdventureOnMapData::desc() const
 {
     return l_desc;
 }
 
-QString AdventureOnMapData::clue()
+QString AdventureOnMapData::clue() const
 {
     return l_clue;
 }
@@ -38,6 +43,16 @@ QString AdventureOnMapData::clue()
 int AdventureOnMapData::award() const
 {
     return l_award;
+}
+
+double AdventureOnMapData::geoLat()
+{
+    return l_geoLat;
+}
+
+double AdventureOnMapData::geoLong()
+{
+    return l_geoLong;
 }
 
 void AdventureOnMapData::setAdventureId(const int &adventureId)

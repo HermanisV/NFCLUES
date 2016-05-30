@@ -8,14 +8,58 @@ Map {
     property int pressX : -1
     property int pressY : -1
     property int threshold : 30
-    property variant location: QtPositioning.coordinate( 59.93, 10.76)
+    property variant defaultLocation: QtPositioning.coordinate( 56.8965, 24.1436)
+    property variant adventuresOnMapModel
     //Signals
     signal coordinatesCaptured(double latitude, double longitude)
     signal showPopupMenu(variant coordinate)
     id: map
-    center: locationOslo
     zoomLevel: 13
+    center: defaultLocation
 
+    //
+    PositionSource {
+        id: positionSource
+        active: true
+        updateInterval: 30000 // 30 sec
+        onPositionChanged:  {
+            var currentPosition = positionSource.position.coordinate
+            map.center = currentPosition
+        }
+    }
+    //
+    //View for all adventures
+    MapItemView {
+        model:thisAdvendture.adventuresOnMap
+        delegate: pointerDelegate
+    }
+    //Delegata for building pinters
+    Component {
+        id: pointerDelegate
+        MapQuickItem {
+            coordinate: QtPositioning.coordinate(50,50)
+            //Anhors pointer right in the middle of bottom
+            anchorPoint.x: image.width * 0.5
+            anchorPoint.y: image.height
+
+            sourceItem: Column {
+                Image { id: image; source: "../Resources/marker.png" }
+                Text { text: "wa waa"; font.bold: true }
+            }
+        }
+    }
+    MapQuickItem {
+        coordinate: QtPositioning.coordinate(56.310,26.191406)
+        //Anhors pointer right in the middle of bottom
+        anchorPoint.x: image.width * 0.5
+        anchorPoint.y: image.height
+
+        sourceItem: Column {
+            Image { id: image; source: "../Resources/marker.png" }
+            Text { text: "wa waa"; font.bold: true }
+        }
+    }
+    //Mouse area for all
     MouseArea {
         id: mouseArea
         property variant lastCoordinate

@@ -5,20 +5,17 @@
 #include <QQmlContext>
 #include <QtQuick/qquickview.h>
 #include <QNetworkAccessManager>
-#include <QQmlNetworkAccessManagerFactory>
-#include <QtScript/qscriptengine.h>
-#include <QtScript/QScriptValueIterator>
 #include "qqml.h"
 #include "userhandler.h"
 #include "adventurehandler.h"
 #include "nfchandler.h"
 #include  "system.h"
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
-
     //UserHandler
     qmlRegisterType<UserHandler>("NFCUser",0,1,"HandleUser");
     //AdventureHandler

@@ -3,6 +3,7 @@ TEMPLATE = app
 QT += qml quick
 QT += qml quick widgets
 QT += core
+QT += positioning
 QT += network
 QT += nfc
 QT += sql
@@ -20,7 +21,8 @@ SOURCES += main.cpp \
     adventureonuserdata.cpp \
     nfchandler.cpp \
     system.cpp \
-    adventureonmapdata.cpp
+    adventureonmapdata.cpp \
+    nfcnetwork.cpp
 
 RESOURCES += qml.qrc
 
@@ -51,7 +53,8 @@ HEADERS += \
     adventureonuserdata.h \
     nfchandler.h \
     system.h \
-    adventureonmapdata.h
+    adventureonmapdata.h \
+    nfcnetwork.h
 
 DISTFILES += \
     helper.js

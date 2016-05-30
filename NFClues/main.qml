@@ -44,6 +44,7 @@ ApplicationWindow {
         Component.onCompleted: {
             console.log("compnonent complete")
             actionMenu.createMenu(userOK)
+            thisAdvendture.buildAdventuresOnMap()
             console.log("creating map")
             createMap()
             console.log("Current env: " + thisSystem.getEnv())

@@ -5,7 +5,6 @@
 #include <QString>
 #include <QDebug>
 
-
 //Qbject used to build record for model
 //To be passed through AdventureHandler::adventuresOnMap to be delefgated on map
 class AdventureOnMapData : public QObject
@@ -22,7 +21,7 @@ class AdventureOnMapData : public QObject
 
 public:
     AdventureOnMapData(QObject *parent=0);
-    AdventureOnMapData(const int &adventureId, const int &tagId, const QString &name, , const QString &desc, const QString &clue, const int &award,  const double &geoLat,  const QString &geoLong, QObject *parent=0);
+    AdventureOnMapData(const int &adventureId, const int &tagId, const QString &name, const QString &desc, const QString &clue, const int &award, const double &geoLat, const double &geoLong, QObject *parent=0);
     //Getters
     int     adventureId() const;
     int     tagId() const;
