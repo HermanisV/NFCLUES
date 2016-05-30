@@ -6,6 +6,7 @@ QT += core
 QT += network
 QT += nfc
 QT += sql
+QT += script
 android{
 QT += androidextras
 }

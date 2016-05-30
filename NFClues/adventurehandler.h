@@ -33,6 +33,7 @@ public:
     Q_PROPERTY(double geoLong READ geoLong WRITE setGeoLong NOTIFY geoLongChanged)
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorChanged)
     Q_PROPERTY(int status READ status WRITE setStatus NOTIFY statusChanged)
+    Q_PROPERTY(QList<QObject *> adventuresOnMap READ adventuresOnMap NOTIFY adventuresOnMapChanged)
 
     //Getters
     int adventureId();
@@ -46,6 +47,7 @@ public:
     double geoLong();
     QString errorString();
     int     status();
+    QList<QObject *> adventuresOnMap();
 
     //Setters
     void    setAdventureId(const int &adventureId);
@@ -64,7 +66,7 @@ public:
     Q_INVOKABLE void  getAdventureData(const int p_adventureId);
     Q_INVOKABLE int  getRandomTagId();
     Q_INVOKABLE void initAdventure(const int p_adventureId, const int p_tagId, const double p_lat, const double p_long);
-
+    Q_INVOKABLE void buildAdventuresOnMap();
     //Signals
 signals:
     void adventureIdChanged();
@@ -81,6 +83,7 @@ signals:
     void gotInit();
     void error();\
     void errorChanged();
+    void adventuresOnMapChanged();
     //Slots
 protected slots:
     void handleError(QString p_error);
@@ -99,8 +102,7 @@ private:
     QString l_error;
     QSqlDatabase l_db;
     bool l_loading;
-
-    void createDb();
+    QList<QObject *> l_adventuresOnMap;
 };
 
 
