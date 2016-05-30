@@ -14,7 +14,7 @@ Flickable{
     property string thisAdventureClue
     property int thisAdventureAward
     property int thisAdventureCompletedBy
-    property int thisAdventureInit : 1
+    property bool thisAdventureInit : true
 
     id: bigFlick
     width: Screen.width
@@ -141,12 +141,16 @@ Flickable{
 //                }
 
                 Button {
-                    id: btnLogin
+                    id: btnInit
+                    visible: thisAdventureInit
                     Layout.fillHeight: true
                     Layout.minimumWidth: parent.width * 0.75
                     text: qsTr("Initialise")
                     onClicked: {
                         console.log("Clicked init")
+                        stackView.push({ item: Qt.resolvedUrl("../Items/InitAdventure.qml") ,
+                                           properties: { "thisAdventureId"  : thisAdventureId}})
+                        stackView.currentItem.closeForm.connect(stackView.backForm)
                     }
                 }
             }

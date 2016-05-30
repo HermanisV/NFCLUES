@@ -62,6 +62,9 @@ public:
     //Methods
     Q_INVOKABLE void  createNewAdventure(const int ownerId);
     Q_INVOKABLE void  getAdventureData(const int p_adventureId);
+    Q_INVOKABLE int  getRandomTagId();
+    Q_INVOKABLE void initAdventure(const int p_adventureId, const int p_tagId, const double p_lat, const double p_long);
+
     //Signals
 signals:
     void adventureIdChanged();
@@ -75,6 +78,7 @@ signals:
     void statusChanged();
     void gotError(QString);
     void gotAdventure();
+    void gotInit();
     void error();\
     void errorChanged();
     //Slots

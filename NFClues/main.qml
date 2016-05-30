@@ -186,6 +186,9 @@ ApplicationWindow {
         onGotAdventure: {
             adventureOk = true
         }
+        onGotInit: {
+            infoDialog.showInfo("Adventure initialized!")
+        }
     }
     System{
         id: thisSystem
@@ -203,6 +206,13 @@ ApplicationWindow {
         function showCordi(caption) {
             errorDialog.text = caption;
             errorDialog.open();
+        }
+    }
+    MessageDialog {
+        id: infoDialog
+        function showInfo(caption) {
+            infoDialog.text = caption;
+            infoDialog.open();
         }
     }
 

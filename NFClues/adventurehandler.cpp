@@ -3,6 +3,7 @@
 #include <QtCore>
 #include <QtSql>
 #include <QtDebug>
+#include <stdlib.h>
 #include <QString>
 
 
@@ -314,6 +315,99 @@ void AdventureHandler::getAdventureData(const int p_adventureId)
                 qDebug() << "Closing connection";
                 l_db.close();
                 gotError("Adventure wasn't found");
+            }
+        }
+        else
+        {
+            qDebug() << "Error happened - " << l_db.lastError().text();
+            qDebug() << "Closing connection";
+            l_db.close();
+            gotError("Ooops, there seems to be a problem");
+        }
+    }
+}
+
+int AdventureHandler::getRandomTagId()
+{
+    qDebug() << "In AdventureHandler::getRandomTagId";
+    NfcDb DB;
+    l_db = DB.getDB();
+    if (l_db.open())
+    {
+        qDebug() << "DB connection opened.";
+        QSqlQuery tagIdChech(l_db);
+        //Fetch full user data by id
+        bool isTaken = true; //Value to check if this random tagid is already taken
+        while (isTaken){
+            int randomTagId = rand() % 9999999 + 1000000; //Get random Tag id that is 7 digits long
+            QString tagIdQuery = QString("select count(Tag_id) from Adventures where Tag_id = %1;").arg(randomTagId);//Check Db if this Tag Id is taken, if is try another random
+            qDebug() << "Querry "<< tagIdQuery;
+            if (tagIdChech.exec(tagIdQuery))
+            {
+                if (tagIdChech.next()) {
+                    if (tagIdChech.value(0).toInt() == 0){
+                        qDebug()<< "Found unique Tag id as: "<<randomTagId;
+                        isTaken = false;
+                        return randomTagId;
+                    }
+                }
+                else{
+                    qDebug() << "Closing connection";
+                    l_db.close();
+                    gotError("Ooops, there seems to be a problem");
+                }
+            }
+            else
+            {
+                qDebug() << "Error happened - " << l_db.lastError().text();
+                qDebug() << "Closing connection";
+                l_db.close();
+                gotError("Ooops, there seems to be a problem");
+            }
+        }
+    }
+}
+
+void AdventureHandler::initAdventure(const int p_adventureId,const int p_tagId,const double p_lat,const double p_long)
+{
+    qDebug() << "In AdventureHandler::initAdventure";
+    //Validate
+    if (p_adventureId == NULL)
+        gotError("No adventure ID Passed");
+    if (p_tagId == NULL)
+        gotError("No Tag_id passed");
+    if (p_lat == NULL)
+        gotError("No Lattitude passed");
+    if (p_long == NULL)
+        gotError("No Longituce passed");
+
+    NfcDb DB;
+    l_db = DB.getDB();
+    if (l_db.open())    {
+        qDebug() << "DB connection opened.";
+        QSqlQuery validateFetch(l_db);
+        //Fetch full user data by id
+        QString validateQuerry = QString("select Adventure_id from Adventures where Tag_id = %1;").arg(p_tagId); //Check if this tag id isn''t assigned to an existing adventure
+        qDebug() << "Querry "<< validateQuerry;
+        if (validateFetch.exec(validateQuerry))
+        {
+            if (validateFetch.next()) {
+                qDebug() << "Wrong Tag Id";
+                qDebug() << "Closing connection";
+                l_db.close();
+                gotError("Ooops, there seems to be a problem");
+            }
+            else{
+                qDebug() <<  "Tag Id Ok";                
+                QString updateAdventure = QString("update adventures set Tag_id = %1,Long = %2,Lat = %3,Status = 2 where Adventure_id = %4;").arg(p_tagId).arg(p_long).arg(p_lat).arg(p_adventureId);
+                qDebug() << "Update: "<<updateAdventure;
+                QSqlQuery adventureInit(l_db);
+                if (adventureInit.exec(updateAdventure))
+                {
+                    qDebug() << "Upadted";
+                    l_db.close();
+                    emit gotInit();
+                }
             }
         }
         else

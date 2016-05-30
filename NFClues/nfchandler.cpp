@@ -23,6 +23,11 @@ QNdefNfcTextRecord NFCHandler::nfcText()
     return l_nfcText;
 }
 
+QNdefMessage NFCHandler::nfcMessage()
+{
+    return l_nfcMessage;
+}
+
 QString NFCHandler::errorString()
 {
     return l_error;
@@ -44,6 +49,14 @@ void NFCHandler::setNfcText(const QNdefNfcTextRecord &nfctext)
     l_nfcText = nfctext;
     emit nfcTextChanged();
 }
+
+void NFCHandler::setNfcMessage(const QNdefMessage &nfcMessage)
+{
+    if (nfcMessage == l_nfcMessage)
+        return;
+    l_nfcMessage = nfcMessage;
+    emit nfcMessageChanged();
+}
 //Methods/////////////
 /// \brief NFCHandler::startReading
 /// Initiated from QMl to tell backend to start looking for tag to read from
@@ -63,7 +76,7 @@ void NFCHandler::startWriting()
 }
 //Slots////////////////
 /// \brief NFCHandler::targetDetected
-/// Slot called form QNearFieldManager when a tag hs been detected
+/// Slot called form QNearFieldManager when a tag has been detected
 /// \param message - filled with a message if it's returned from manager
 /// \param target - target tag that is detected
 void NFCHandler::targetDetected(const QNdefMessage &message, QNearFieldTarget *target)
@@ -92,12 +105,20 @@ void NFCHandler::targetDetected(const QNdefMessage &message, QNearFieldTarget *t
         break;
     }
 }
-
+///
+/// \brief NFCHandler::targetLost
+/// A slot called from QNearFieldManager when a target has been lost
+/// \param target - pointer to the lost target
 void NFCHandler::targetLost(QNearFieldTarget *target)
 {
     target->deleteLater();
 }
-
+///
+/// \brief NFCHandler::targetError
+/// Slot called from targetDetected if an error has occured during NFC transaction
+/// \param error - the type of error
+/// \param id - the NFc request that failed
+///
 void NFCHandler::targetError(QNearFieldTarget::Error error, const QNearFieldTarget::RequestId &id)
 {
     if (l_request == id) {
@@ -158,7 +179,11 @@ void NFCHandler::stopLooking()
 {
     l_manager->stopTargetDetection();
 }
-
+///
+/// \brief NFCHandler::addText
+/// Used to add text type record to the message being written in a tag
+/// \param textRecord - The record that should bee added to the message
+///
 void NFCHandler::addText(QNdefNfcTextRecord textRecord)
 {
     l_nfcMessage.append(l_nfcText);
