@@ -5,6 +5,8 @@
 #include <QtDebug>
 #include <stdlib.h>
 #include <QString>
+#include <QNetworkAccessManager>
+#include <QJsonDocument>
 
 
 AdventureHandler::AdventureHandler(QObject *parent) : QObject(parent)

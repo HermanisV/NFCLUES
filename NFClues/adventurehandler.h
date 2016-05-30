@@ -6,6 +6,7 @@
 #include <QtSql>
 #include <QtDebug>
 #include <QString>
+#include <QNetworkAccessManager>
 #include "nfcdb.h"
 
 /* This class is used for handling all Adventure related data
