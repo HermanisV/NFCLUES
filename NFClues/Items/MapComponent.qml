@@ -39,25 +39,35 @@ Map {
             anchorPoint.y: image.height
 
             sourceItem: Column {
-                Image { id: image; source: "../Resources/marker.png" }
+                Image {
+                    id: image;
+                    source: "../Resources/marker.png"
+                }
                 Text { text: name;
                         font.bold: true
                 }
             }
+            //On click area on top of pointer
+            MouseArea{
+                id: mapItemMouse
+                height: image.height * 2
+                width: image.width * 2
+                onClicked: {
+                    console.log("Clicked adventure " + adventureId)
+                    //Open this adventures page
+                    stackView.push({ item: Qt.resolvedUrl("../Views/SeeAdventure.qml") ,
+                                       properties: { "ownerUserLogin"  : "Login",
+                                           "thisAdventureName"  :   name,
+                                           "thisAdventureDesc"  :   description,
+                                           "thisAdventureClue"  :   clue,
+                                           "thisAdventureAward" :   award,
+                                           "thisAdventureInit"  :   2,
+                                           "thisAdventureInit"  :   true}})
+                    stackView.currentItem.closeForm.connect(stackView.backForm)
+                }
+            }
         }
     }
-//    //Delegata for building pinters
-//    MapQuickItem {
-//        coordinate: QtPositioning.coordinate(56.310,26.191406)
-//        //Anhors pointer right in the middle of bottom
-//        anchorPoint.x: image.width * 0.5
-//        anchorPoint.y: image.height
-
-//        sourceItem: Column {
-//            Image { id: image; source: "../Resources/marker.png" }
-//            Text { text: "wa waa"; font.bold: true }
-//        }
-//    }
     //Mouse area for all
     MouseArea {
         id: mouseArea

@@ -142,7 +142,7 @@ Flickable{
 
                 Button {
                     id: btnInit
-                    visible: thisAdventureInit
+                    visible: !thisAdventureInit
                     Layout.fillHeight: true
                     Layout.minimumWidth: parent.width * 0.75
                     text: qsTr("Initialise")
