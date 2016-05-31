@@ -11,6 +11,8 @@
 #include "nfchandler.h"
 #include "system.h"
 #include "adventureonmapmodel.h"
+#include "vibrator.h"
+
 AdventureOnMapModel *g_adventuresOnMap;
 int main(int argc, char *argv[])
 {
@@ -27,9 +29,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<System>("ThisSystem",0,1,"System");
     //Map item model    
     qmlRegisterType<AdventureOnMapModel>("AdventureOnMap", 0, 1, "AdventureOnMapModel");
-//    QQmlApplicationEngine engine;
-//    AdventureOnMapModel adventuresOnMap;
-//    engine.rootContext()->setContextProperty("AdventuresOnMapModel", &adventuresOnMap);
+    Vibrator vibrator;
+    engine.rootContext()->setContextProperty("Vibrator", &vibrator);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 

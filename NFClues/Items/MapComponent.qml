@@ -55,6 +55,7 @@ Map {
                 onClicked: {
                     console.log("Clicked adventure " + adventureId)
                     //Open this adventures page
+                    //Vibrator.vibrate(100)//currently crashing the app
                     stackView.push({ item: Qt.resolvedUrl("../Views/SeeAdventure.qml") ,
                                        properties: { "ownerUserLogin"  : "Login",
                                            "thisAdventureName"  :   name,
@@ -62,7 +63,8 @@ Map {
                                            "thisAdventureClue"  :   clue,
                                            "thisAdventureAward" :   award,
                                            "thisAdventureInit"  :   2,
-                                           "thisAdventureInit"  :   true}})
+                                           "thisAdventureInit"  :   true,
+                                           "fromMap"            :   true}})
                     stackView.currentItem.closeForm.connect(stackView.backForm)
                 }
             }

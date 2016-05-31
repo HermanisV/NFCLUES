@@ -21,9 +21,9 @@ SOURCES += main.cpp \
     adventureonuserdata.cpp \
     nfchandler.cpp \
     system.cpp \
-    adventureonmapdata.cpp \
     nfcnetwork.cpp \
-    adventureonmapmodel.cpp
+    adventureonmapmodel.cpp \
+    vibrator.cpp
 
 RESOURCES += qml.qrc
 
@@ -54,9 +54,9 @@ HEADERS += \
     adventureonuserdata.h \
     nfchandler.h \
     system.h \
-    adventureonmapdata.h \
     nfcnetwork.h \
-    adventureonmapmodel.h
+    adventureonmapmodel.h \
+    vibrator.h
 
 DISTFILES += \
     helper.js \
