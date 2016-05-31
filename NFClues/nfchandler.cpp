@@ -102,16 +102,17 @@ void NFCHandler::targetDetected(QNearFieldTarget *target)
         connect(target, SIGNAL(ndefMessagesWritten()), this, SLOT(ndefMessageWritten()));
         connect(target, SIGNAL(error(QNearFieldTarget::Error,QNearFieldTarget::RequestId)),
                 this, SLOT(targetError(QNearFieldTarget::Error,QNearFieldTarget::RequestId)));
-        if (target->hasNdefMessage()) //This is getting commented out for easier
-        {
-            gotError("Tag already filled");
-        }
-        else
-        {
+//        [31.05] removed while investigate why tags don't get read as empty, although they are
+//        if (target->hasNdefMessage()) //This is getting commented out for easier
+//        {
+//            gotError("Tag already filled");
+//        }
+//        else
+//        {
             l_request = target->writeNdefMessages(QList<QNdefMessage>() << l_nfcMessage);
             if (!l_request.isValid()) // cannot write messages
                 targetError(QNearFieldTarget::NdefWriteError, l_request);
-        }
+//        }
         break;
     case ReadNdef:
         connect(target, SIGNAL(error(QNearFieldTarget::Error,QNearFieldTarget::RequestId)),

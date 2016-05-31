@@ -62,7 +62,6 @@ Map {
                                            "thisAdventureDesc"  :   description,
                                            "thisAdventureClue"  :   clue,
                                            "thisAdventureAward" :   award,
-                                           "thisAdventureInit"  :   2,
                                            "thisAdventureInit"  :   true,
                                            "fromMap"            :   true}})
                     stackView.currentItem.closeForm.connect(stackView.backForm)

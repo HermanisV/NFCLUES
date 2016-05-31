@@ -66,8 +66,6 @@ private:
     QString l_error;
     QNdefMessage                l_nfcMessage;
     QNdefNfcTextRecord          l_nfcText;
-
-
     //
     QNearFieldManager           *l_manager;
     QNearFieldTarget::RequestId l_request;

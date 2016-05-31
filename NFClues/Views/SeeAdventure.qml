@@ -13,8 +13,9 @@ Flickable{
     property string thisAdventureClue
     property int thisAdventureAward
     property int thisAdventureCompletedBy
-    property bool thisAdventureInit : true
-    property bool fromMap : false
+    property bool canInit : false   //can it be initilised
+    property bool isOwner : false   //is caller Owner
+    property bool fromMap : false   //is it called form Map
 
     id: bigFlick
     width: Screen.width
@@ -124,7 +125,7 @@ Flickable{
             RowLayout {
                 id: btnRow
                 anchors.top: seeAdvRect.bottom
-                anchors.topMargin: 55
+                anchors.topMargin: 16
                 width: seeAdvRect.width
                 height: Screen.height * 0.05
 
@@ -148,7 +149,7 @@ Flickable{
 
                 Button {
                     id: btnInit
-                    visible: !thisAdventureInit
+                    visible: canInit && isOwner
                     Layout.fillHeight: true
                     Layout.minimumWidth: parent.width * 0.75
                     text: qsTr("Initialise")
@@ -157,6 +158,17 @@ Flickable{
                         stackView.push({ item: Qt.resolvedUrl("../Items/InitAdventure.qml") ,
                                            properties: { "thisAdventureId"  : thisAdventureId}})
                         stackView.currentItem.closeForm.connect(stackView.backForm)
+                    }
+                }
+
+                Button {
+                    id: btnComplete
+                    visible: (!(canInit && isOwner) && mainUserHandle.userOK)
+                    Layout.fillHeight: true
+                    Layout.minimumWidth: parent.width * 0.75
+                    text: qsTr("Complete")
+                    onClicked: {
+                        console.log("Clicked complete")
                     }
                 }
             }
