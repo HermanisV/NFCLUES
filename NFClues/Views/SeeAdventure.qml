@@ -1,4 +1,3 @@
-import QtQuick 2.0
 import QtQuick 2.5
 import QtQuick.Window 2.0
 import QtQuick.Controls 1.4
@@ -14,7 +13,9 @@ Flickable{
     property string thisAdventureClue
     property int thisAdventureAward
     property int thisAdventureCompletedBy
-    property bool thisAdventureInit : true
+    property bool canInit : false   //can it be initilised
+    property bool isOwner : false   //is caller Owner
+    property bool fromMap : false   //is it called form Map
 
     id: bigFlick
     width: Screen.width
@@ -39,12 +40,12 @@ Flickable{
         Rectangle {
             id: seeAdvRect
             color: "lightgray"
-            anchors.leftMargin: 136
+            anchors.left: parent.left
+            anchors.leftMargin: parent.width * 0.1
             width: parent.width * 0.8
-            height: parent.height * 0.7
+            height: parent.height * 0.8
             anchors.top: parent.top
             anchors.topMargin: 16
-            anchors.left: parent.left
             Flickable {
                 id: flickable1
                 anchors.fill: parent
@@ -56,60 +57,66 @@ Flickable{
                 Column {
                     id: seeAdvCols
                     width: parent.width
-                    anchors.margins: 5
                     spacing: 16
                     Text {
                         id: txtAdvName
                         text: thisAdventureName
                         font.bold: true
-                        font.pixelSize: 36
+                        font.pointSize: 24
+                        height: Screen.height * 0.065
                     }
                     Text {
                         id: txtAdvMadeBy
+                        visible: !fromMap
                         text: qsTr("Adventure by: " + ownerUserLogin)
-                        font.pixelSize: 26
+                        //font.pixelSize: 26
+                        font.pointSize: 16
                     }
 
                     Text {
                         text: "Description"
-                        font.pixelSize: 32
+                        font.pointSize: 18
                         font.bold: true
                     }
 
                     Text {
                         id: txtAdvDesc
-                        text: thisAdventureDesc
-                        font.pixelSize: 26
+                        text: "     "+ thisAdventureDesc
+                        font.pointSize: 16
                     }
 
                     Text {
                         text: "Clue"
-                        font.pixelSize: 32
+                        font.pointSize: 18
                         font.bold: true
                     }
 
                     Text {
                         id: txtAdvClue
-                        text: thisAdventureClue
-                        font.pixelSize: 26
+                        text: "     "+ thisAdventureClue
+                        font.pointSize: 16
                     }
 
                     Rectangle {
+                        id: rectangle1
                         width: parent.width
                         height: 26
                         color: "lightgray"
                         Text {
                             id: txtCompletedBy
+                            visible: !fromMap
                             text: qsTr("This adventure has been completed by " + thisAdventureCompletedBy.toString() + " adventurers")
                             anchors.left: parent.left
-                            font.pixelSize: 26
+                            font.pointSize: 16
                         }
 
                         Text {
                             id: txtAdvWorth
                             text: qsTr("Worth " + thisAdventureAward.toString() + "pts")
+                            anchors.top: txtCompletedBy.bottom
+                            anchors.topMargin: 2
                             anchors.right: parent.right
-                            font.pixelSize: 26
+                            font.pointSize: 16
                         }
                     }
                 }
@@ -118,7 +125,7 @@ Flickable{
             RowLayout {
                 id: btnRow
                 anchors.top: seeAdvRect.bottom
-                anchors.topMargin: 55
+                anchors.topMargin: 16
                 width: seeAdvRect.width
                 height: Screen.height * 0.05
 
@@ -142,7 +149,7 @@ Flickable{
 
                 Button {
                     id: btnInit
-                    visible: thisAdventureInit
+                    visible: canInit && isOwner
                     Layout.fillHeight: true
                     Layout.minimumWidth: parent.width * 0.75
                     text: qsTr("Initialise")
@@ -151,6 +158,17 @@ Flickable{
                         stackView.push({ item: Qt.resolvedUrl("../Items/InitAdventure.qml") ,
                                            properties: { "thisAdventureId"  : thisAdventureId}})
                         stackView.currentItem.closeForm.connect(stackView.backForm)
+                    }
+                }
+
+                Button {
+                    id: btnComplete
+                    visible: (!(canInit && isOwner) && mainUserHandle.userOK)
+                    Layout.fillHeight: true
+                    Layout.minimumWidth: parent.width * 0.75
+                    text: qsTr("Complete")
+                    onClicked: {
+                        console.log("Clicked complete")
                     }
                 }
             }

@@ -10,14 +10,11 @@
         <file>Forms/Login.qml</file>
         <file>Views/Leaderboards.qml</file>
         <file>Views/YourAdventures.qml</file>
-        <file>Resources/left.png</file>
         <file>Resources/marker.png</file>
-        <file>Resources/scale.png</file>
-        <file>Resources/scale_end.png</file>
         <file>Resources/star.png</file>
         <file>Items/MainMenu.qml</file>
         <file>Items/MapPopup.qml</file>
-        <file>Views/InitAdventure.qml</file>
         <file>Items/InitAdventure.qml</file>
+        <file>Forms/NfcManualWrite.qml</file>
     </qresource>
 </RCC>

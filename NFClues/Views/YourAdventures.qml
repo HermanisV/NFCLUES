@@ -69,14 +69,27 @@ Flickable{
                 }
                 onClicked: {
                     console.log("clicked to see adventure " + currentRow)
-                    console.log("adventureRecord.name " + model[currentRow].name)
+
+                    ///Translate advnture status
+                    var canInit
+                    switch (model[currentRow].status) {
+                    case 1:
+                        canInit = true
+                        break
+                    case 2:
+                        canInit = false
+                        break
+                    default:
+                        console.log("Unsupported status!")
+                    }
                     stackView.push({ item: Qt.resolvedUrl("../Views/SeeAdventure.qml") ,
                                        properties: { "ownerUserLogin"  : mainUserHandle.login,
                                            "thisAdventureName"  :   model[currentRow].name,
                                            "thisAdventureDesc"  :   model[currentRow].desc,
                                            "thisAdventureClue"  :   model[currentRow].clue,
                                            "thisAdventureAward" :   model[currentRow].award,
-                                           "thisAdventureInit"  :   model[currentRow].status,
+                                           "canInit"            :   canInit,
+                                           "isOwner"            :   true,
                                            "thisAdventureId"    :   model[currentRow].adventureId}})
                     stackView.currentItem.closeForm.connect(stackView.backForm)
                 }

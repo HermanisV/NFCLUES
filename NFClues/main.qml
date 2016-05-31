@@ -4,7 +4,7 @@ import QtQuick.Layouts 1.2
 import QtPositioning 5.2
 import QtLocation 5.6
 import QtQuick.Window 2.0
-import QtNfc 5.2
+import NFCTag 0.1
 import NFCUser 0.1
 import NFCAdventure 0.1
 import QtQuick.Dialogs 1.2
@@ -22,7 +22,7 @@ ApplicationWindow {
     function createMap()
     {
         var plugin
-            plugin = Qt.createQmlObject ('import QtLocation 5.3; Plugin{ name:"osm"}', appWindow)
+        plugin = Qt.createQmlObject ('import QtLocation 5.3; Plugin{ name:"osm"}', appWindow)
         if (map) {
             map.destroy()
         }
@@ -42,8 +42,11 @@ ApplicationWindow {
     MainMenu{
         id: mainMenu
         Component.onCompleted: {
+            ////This is INIT
             console.log("compnonent complete")
             actionMenu.createMenu(userOK)
+            console.log("Building adventure on MAP")
+            thisAdvendture.buildAdventuresOnMap()
             console.log("creating map")
             createMap()
             console.log("Current env: " + thisSystem.getEnv())
@@ -86,6 +89,11 @@ ApplicationWindow {
                 stackView.push({ item: Qt.resolvedUrl("Forms/Login.qml")})
                 stackView.currentItem.closeForm.connect(stackView.closeForm)
                 stackView.currentItem.gotLogin.connect(stackView.closeForm)
+                break
+            case "initTag":
+                stackView.pop({item:page, immediate: true})
+                stackView.push({ item: Qt.resolvedUrl("Forms/NfcManualWrite.qml")})
+                stackView.currentItem.closeForm.connect(stackView.closeForm)
                 break
             default:
                 console.log("Unsupported action!")
@@ -143,7 +151,7 @@ ApplicationWindow {
     // Problem with determining proper height of mapComponent
     // Since manuBare height cannot be read
     // so top of mapComponent will be overlaid with mainMenu, for now.
-    // Take this into account when mapping in this element    
+    // Take this into account when mapping in this element
     Component {
         id: mapComponent
         MapComponent{
@@ -174,7 +182,7 @@ ApplicationWindow {
             userOK = true
             mainMenu.actionMenu.createMenu(userOK)
         }
-    }    
+    }
     //QObject from adventurehandler.h
     HandleAdventure{
         id: thisAdvendture
@@ -190,6 +198,28 @@ ApplicationWindow {
             infoDialog.showInfo("Adventure initialized!")
         }
     }
+    //QObject form nfchandler.h
+    HandleTag{
+        id: thisTag
+        property bool tagOk: false
+        onError: {
+            errorDialog.showError(errorString)
+        }
+        onTagTextOk: {
+            tagOk = true
+        }
+        onStartedLooking: {
+            infoDialog.showInfo("Please place device on the Tag")
+        }
+        onFoundTarget: {
+            infoDialog.autoClose()
+        }
+        onTagWritten: {
+            infoDialog.showInfo("Tag has been written")
+        }
+
+    }
+
     System{
         id: thisSystem
     }
@@ -213,6 +243,9 @@ ApplicationWindow {
         function showInfo(caption) {
             infoDialog.text = caption;
             infoDialog.open();
+        }
+        function autoClose(){
+            infoDialog.close();
         }
     }
 

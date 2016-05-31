@@ -5,20 +5,20 @@
 #include <QQmlContext>
 #include <QtQuick/qquickview.h>
 #include <QNetworkAccessManager>
-#include <QQmlNetworkAccessManagerFactory>
-#include <QtScript/qscriptengine.h>
-#include <QtScript/QScriptValueIterator>
 #include "qqml.h"
 #include "userhandler.h"
 #include "adventurehandler.h"
 #include "nfchandler.h"
-#include  "system.h"
+#include "system.h"
+#include "adventureonmapmodel.h"
+#include "vibrator.h"
+
+AdventureOnMapModel *g_adventuresOnMap;
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
-
     //UserHandler
     qmlRegisterType<UserHandler>("NFCUser",0,1,"HandleUser");
     //AdventureHandler
@@ -27,6 +27,10 @@ int main(int argc, char *argv[])
     qmlRegisterType<NFCHandler>("NFCTag",0,1,"HandleTag");
     //TagHandler
     qmlRegisterType<System>("ThisSystem",0,1,"System");
+    //Map item model    
+    qmlRegisterType<AdventureOnMapModel>("AdventureOnMap", 0, 1, "AdventureOnMapModel");
+    Vibrator vibrator;
+    engine.rootContext()->setContextProperty("Vibrator", &vibrator);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 

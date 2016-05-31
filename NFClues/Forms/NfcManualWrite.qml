@@ -1,13 +1,13 @@
-import QtQuick 2.5
+import QtQuick 2.2
+import QtQuick.Controls 1.2
+import NFCTag 0.1
 import QtQuick.Window 2.0
-import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.2
 import NFCUser 0.1
 import QtQuick.Dialogs 1.2
+
 Flickable{
     signal closeForm()
-    signal gotLogin()
-    property bool userOK: false
 
     id: bigFlick
     width: Screen.width
@@ -27,34 +27,40 @@ Flickable{
     }
 
     Rectangle {
-        id: logFormRectl
+        id: manualNfcWriteRect
         anchors.fill: parent
         color: "lightgray"
-        ColumnLayout {
-            id: loginTab
+        Rectangle{
+            id: manualTagRct
             width: parent.width * 0.8
-            spacing: 35
+            height: parent.height * 0.6
+            color: "lightgray"
+            anchors.top: manualNfcWriteRect.top
+            anchors.topMargin: 16
             anchors.left: parent.left
             anchors.leftMargin: parent.width * 0.1
-            anchors.top: parent.top
-            anchors.topMargin: 45
-            TextField {
-                id: logUserLogin
-                Layout.fillWidth: true
-                maximumLength: 40
-                height: Screen.height * 0.07
-                font.pixelSize: 36
-                placeholderText: "Username"
-            }
 
             TextField {
-                id: logUserPassword
-                Layout.fillWidth: true
-                maximumLength: 40
+                id: tagidtext
+                width: parent.width * 0.8
                 height: Screen.height * 0.07
+                anchors.right: parent.right
+                anchors.rightMargin: 0
+                anchors.top: parent.top
+                anchors.topMargin: parent.height * 0.1
                 font.pixelSize: 36
-                placeholderText: "Password"
-                echoMode: TextInput.PasswordEchoOnEdit
+                //validator: IntValidator
+            }
+
+            Label {
+                id: yourTagLbl
+                x: 0
+                y: 52
+                font.pixelSize: 36
+                text: qsTr("Your Tag Id: ")
+                anchors.right: tagidtext.left
+                anchors.rightMargin: 0
+                anchors.verticalCenter: tagidtext.verticalCenter
             }
         }
 
@@ -62,9 +68,9 @@ Flickable{
             id: btnRow
             anchors.left: parent.left
             anchors.leftMargin: parent.width * 0.1
-            anchors.top: loginTab.bottom
+            anchors.top: manualTagRct.bottom
             anchors.topMargin: 55
-            width: loginTab.width
+            width: manualTagRct.width
             height: Screen.height * 0.05
 
             Button {
@@ -81,8 +87,7 @@ Flickable{
                 Layout.minimumWidth: parent.width * 0.24
                 text: qsTr("Clear")
                 onClicked: {
-                    logUserLogin.text = ""
-                    logUserPassword.text = ""
+                    tagidtext.text = ""
                 }
             }
 
@@ -90,11 +95,11 @@ Flickable{
                 id: btnLogin
                 Layout.fillHeight: true
                 Layout.minimumWidth: parent.width * 0.5
-                text: qsTr("Login")
-                onClicked: {
-                    mainUserHandle.loginUser(logUserLogin.text,logUserPassword.text);
-                    if (mainUserHandle.userOK){
-                        gotLogin()
+                text: qsTr("Confirm")
+                onClicked: {                    
+                    thisTag.addText(tagidtext.text)
+                    if (thisTag.tagOk){
+                        thisTag.startWriting()
                     }
                 }
             }

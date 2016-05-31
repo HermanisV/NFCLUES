@@ -1,6 +1,8 @@
 import QtQuick 2.0
 import QtPositioning 5.5
 import QtLocation 5.6
+import AdventureOnMap 0.1
+
 Map {
     //props
     property int lastX : -1
@@ -8,14 +10,66 @@ Map {
     property int pressX : -1
     property int pressY : -1
     property int threshold : 30
-    property variant location: QtPositioning.coordinate( 59.93, 10.76)
+    property variant defaultLocation: QtPositioning.coordinate( 56.8965, 24.1436)
+    property variant adventuresOnMapModel
     //Signals
     signal coordinatesCaptured(double latitude, double longitude)
     signal showPopupMenu(variant coordinate)
     id: map
-    center: locationOslo
     zoomLevel: 13
+    center: defaultLocation
 
+    //
+    PositionSource {
+        id: positionSource
+        active: true
+        updateInterval: 30000 // 30 sec
+        onPositionChanged:  {
+            var currentPosition = positionSource.position.coordinate
+            map.center = currentPosition
+        }
+    }
+    //View for all adventures
+    MapItemView {
+        model: thisAdvendture.adventuresOnMap
+        delegate: MapQuickItem {
+            coordinate: QtPositioning.coordinate(geoLat,geoLong)
+            //Anhors pointer right in the middle of bottom
+            anchorPoint.x: image.width * 0.5
+            anchorPoint.y: image.height
+
+            sourceItem: Column {
+                Image {
+                    id: image;
+                    source: "../Resources/marker.png"
+                }
+                Text { text: name;
+                        font.bold: true
+                }
+            }
+            //On click area on top of pointer
+            MouseArea{
+                id: mapItemMouse
+                height: image.height * 2
+                width: image.width * 2
+                onClicked: {
+                    console.log("Clicked adventure " + adventureId)
+                    //Open this adventures page
+                    //Vibrator.vibrate(100)//currently crashing the app
+                    stackView.push({ item: Qt.resolvedUrl("../Views/SeeAdventure.qml") ,
+                                       properties: { "ownerUserLogin"  : "Login",
+                                           "thisAdventureName"  :   name,
+                                           "thisAdventureDesc"  :   description,
+                                           "thisAdventureClue"  :   clue,
+                                           "thisAdventureAward" :   award,
+                                           "thisAdventureInit"  :   true,
+                                           "fromMap"            :   true}})
+                    stackView.currentItem.closeForm.connect(stackView.backForm)
+                }
+            }
+        }
+    }
+    //Mouse area for all
     MouseArea {
         id: mouseArea
         property variant lastCoordinate

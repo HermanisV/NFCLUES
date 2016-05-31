@@ -39,18 +39,24 @@ public:
     Q_INVOKABLE void startReading();
     Q_INVOKABLE void startWriting();
     Q_INVOKABLE void stopLooking();
-    Q_INVOKABLE void addText(QNdefNfcTextRecord textRecord);
+    Q_INVOKABLE void addText(QString text);
 
 signals:
     void tagIdChanged();
     void nfcTextChanged();
     void nfcMessageChanged();
     void gotError(QString);
+    void startedLooking();
+    void foundTarget();
+    void tagWritten();
+    void tagRead();
+    void tagTextOk();
     void error();
 public slots:
-    void targetDetected(const QNdefMessage &message, QNearFieldTarget *target);
+    void targetDetected(QNearFieldTarget *target);
     void targetLost(QNearFieldTarget *target);
     void targetError(QNearFieldTarget::Error error, const QNearFieldTarget::RequestId &id);
+    void ndefMessageWritten();
 protected slots:
     void handleError(QString p_error);
 private:
@@ -60,11 +66,8 @@ private:
     QString l_error;
     QNdefMessage                l_nfcMessage;
     QNdefNfcTextRecord          l_nfcText;
-
-
     //
     QNearFieldManager           *l_manager;
-    QNearFieldTarget            *l_target;
     QNearFieldTarget::RequestId l_request;
 
     //states

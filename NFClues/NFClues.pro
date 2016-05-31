@@ -3,9 +3,11 @@ TEMPLATE = app
 QT += qml quick
 QT += qml quick widgets
 QT += core
+QT += positioning
 QT += network
 QT += nfc
 QT += sql
+QT += script
 android{
 QT += androidextras
 }
@@ -19,7 +21,9 @@ SOURCES += main.cpp \
     adventureonuserdata.cpp \
     nfchandler.cpp \
     system.cpp \
-    adventureonmapdata.cpp
+    nfcnetwork.cpp \
+    adventureonmapmodel.cpp \
+    vibrator.cpp
 
 RESOURCES += qml.qrc
 
@@ -50,7 +54,10 @@ HEADERS += \
     adventureonuserdata.h \
     nfchandler.h \
     system.h \
-    adventureonmapdata.h
+    nfcnetwork.h \
+    adventureonmapmodel.h \
+    vibrator.h
 
 DISTFILES += \
-    helper.js
+    helper.js \
+    Forms/NfcManualWrite.qml
