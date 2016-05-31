@@ -71,6 +71,7 @@ public:
     Q_INVOKABLE int  getRandomTagId();
     Q_INVOKABLE void initAdventure(const int p_adventureId, const int p_tagId, const double p_lat, const double p_long);
     Q_INVOKABLE void buildAdventuresOnMap();
+    Q_INVOKABLE void completeAdventure(const int p_tagId, const int p_userId);
     //Signals
 signals:
     void adventureIdChanged();
@@ -84,6 +85,8 @@ signals:
     void statusChanged();
     void gotError(QString);
     void gotAdventure();
+    void completedAdventure();
+    void updatedPoints();
     void gotInit();
     void error();\
     void errorChanged();
