@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     nfchandler.cpp \
     system.cpp \
     adventureonmapdata.cpp \
-    nfcnetwork.cpp
+    nfcnetwork.cpp \
+    adventureonmapmodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -54,7 +55,9 @@ HEADERS += \
     nfchandler.h \
     system.h \
     adventureonmapdata.h \
-    nfcnetwork.h
+    nfcnetwork.h \
+    adventureonmapmodel.h
 
 DISTFILES += \
-    helper.js
+    helper.js \
+    Forms/NfcManualWrite.qml

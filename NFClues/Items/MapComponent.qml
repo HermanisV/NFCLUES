@@ -1,6 +1,8 @@
 import QtQuick 2.0
 import QtPositioning 5.5
 import QtLocation 5.6
+import AdventureOnMap 0.1
+
 Map {
     //props
     property int lastX : -1
@@ -27,38 +29,35 @@ Map {
             map.center = currentPosition
         }
     }
-    //
     //View for all adventures
     MapItemView {
-        model:thisAdvendture.adventuresOnMap
-        delegate: pointerDelegate
-    }
-    //Delegata for building pinters
-    Component {
-        id: pointerDelegate
-        MapQuickItem {
-            coordinate: QtPositioning.coordinate(50,50)
+        model: thisAdvendture.adventuresOnMap
+        delegate: MapQuickItem {
+            coordinate: QtPositioning.coordinate(geoLat,geoLong)
             //Anhors pointer right in the middle of bottom
             anchorPoint.x: image.width * 0.5
             anchorPoint.y: image.height
 
             sourceItem: Column {
                 Image { id: image; source: "../Resources/marker.png" }
-                Text { text: "wa waa"; font.bold: true }
+                Text { text: name;
+                        font.bold: true
+                }
             }
         }
     }
-    MapQuickItem {
-        coordinate: QtPositioning.coordinate(56.310,26.191406)
-        //Anhors pointer right in the middle of bottom
-        anchorPoint.x: image.width * 0.5
-        anchorPoint.y: image.height
+//    //Delegata for building pinters
+//    MapQuickItem {
+//        coordinate: QtPositioning.coordinate(56.310,26.191406)
+//        //Anhors pointer right in the middle of bottom
+//        anchorPoint.x: image.width * 0.5
+//        anchorPoint.y: image.height
 
-        sourceItem: Column {
-            Image { id: image; source: "../Resources/marker.png" }
-            Text { text: "wa waa"; font.bold: true }
-        }
-    }
+//        sourceItem: Column {
+//            Image { id: image; source: "../Resources/marker.png" }
+//            Text { text: "wa waa"; font.bold: true }
+//        }
+//    }
     //Mouse area for all
     MouseArea {
         id: mouseArea

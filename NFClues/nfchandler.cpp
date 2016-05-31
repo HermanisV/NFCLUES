@@ -10,6 +10,11 @@
 NFCHandler::NFCHandler(QObject *parent) : QObject(parent)
 {
     connect(this,SIGNAL(gotError(QString)), this,SLOT(handleError(QString)));
+    l_manager = new QNearFieldManager(this);
+    connect(l_manager,SIGNAL(targetDetected(QNearFieldTarget*)),
+            this,SLOT(targetDetected(QNearFieldTarget*)));
+    connect(l_manager,SIGNAL(targetLost(QNearFieldTarget*)),
+            this,SLOT(targetLost(QNearFieldTarget*)));
 }
 //Geters///////////
 
@@ -65,13 +70,18 @@ void NFCHandler::startReading()
     l_action = ReadNdef;
     l_manager->setTargetAccessModes(QNearFieldManager::NdefReadTargetAccess);
     l_manager->startTargetDetection();
+    emit startedLooking();
 }
 /// \brief NFCHandler::startWriting
 /// Initiated from QMl to tell backend to stop looking for tags to write in
 void NFCHandler::startWriting()
 {
+
+    qDebug()<<"In NFCHandler::startWriting";
     l_action = WriteNdef;
     l_manager->setTargetAccessModes(QNearFieldManager::NdefWriteTargetAccess);
+    qDebug()<<"Access mode set, starting detection";
+    emit startedLooking();
     l_manager->startTargetDetection();
 }
 //Slots////////////////
@@ -79,19 +89,29 @@ void NFCHandler::startWriting()
 /// Slot called form QNearFieldManager when a tag has been detected
 /// \param message - filled with a message if it's returned from manager
 /// \param target - target tag that is detected
-void NFCHandler::targetDetected(const QNdefMessage &message, QNearFieldTarget *target)
+void NFCHandler::targetDetected(QNearFieldTarget *target)
 {
+
+    qDebug()<<"NFCHandler::targetDetected";
+    emit foundTarget();
     switch (l_action) {
     case NoAction:
         break;
     case WriteNdef:
+        qDebug()<<"Write tag";
+        connect(target, SIGNAL(ndefMessagesWritten()), this, SLOT(ndefMessageWritten()));
         connect(target, SIGNAL(error(QNearFieldTarget::Error,QNearFieldTarget::RequestId)),
                 this, SLOT(targetError(QNearFieldTarget::Error,QNearFieldTarget::RequestId)));
-        connect(target, SIGNAL(ndefMessagesWritten()), this, SLOT(ndefMessageWritten()));
-
-        l_request = target->writeNdefMessages(QList<QNdefMessage>() << l_nfcMessage);
-        if (!l_request.isValid()) // cannot write messages
-            targetError(QNearFieldTarget::NdefWriteError, l_request);
+        if (target->hasNdefMessage()) //This is getting commented out for easier
+        {
+            gotError("Tag already filled");
+        }
+        else
+        {
+            l_request = target->writeNdefMessages(QList<QNdefMessage>() << l_nfcMessage);
+            if (!l_request.isValid()) // cannot write messages
+                targetError(QNearFieldTarget::NdefWriteError, l_request);
+        }
         break;
     case ReadNdef:
         connect(target, SIGNAL(error(QNearFieldTarget::Error,QNearFieldTarget::RequestId)),
@@ -161,6 +181,13 @@ void NFCHandler::targetError(QNearFieldTarget::Error error, const QNearFieldTarg
     }
 }
 
+void NFCHandler::ndefMessageWritten()
+{
+    l_manager ->setTargetAccessModes(QNearFieldManager::NoTargetAccess);
+    l_manager ->stopTargetDetection();
+    emit tagWritten();
+}
+
 void NFCHandler::handleError(QString p_error)
 {
     qDebug() << "Error happened";
@@ -171,6 +198,8 @@ void NFCHandler::handleError(QString p_error)
     else
     {
         l_error = p_error;
+        l_manager ->setTargetAccessModes(QNearFieldManager::NoTargetAccess);
+        l_manager ->stopTargetDetection();
         emit error();
     }
 }
@@ -182,11 +211,18 @@ void NFCHandler::stopLooking()
 ///
 /// \brief NFCHandler::addText
 /// Used to add text type record to the message being written in a tag
-/// \param textRecord - The record that should bee added to the message
+/// \param textRecord - The record that should be added to the message
 ///
-void NFCHandler::addText(QNdefNfcTextRecord textRecord)
+void NFCHandler::addText(QString text)
 {
+    qDebug()<<"In NFCHandler::addText";
+    if (text== NULL || text.length() != 7)
+        gotError("Wrong Tag Id");
+    l_nfcText.setText("This adventures Code: " + text);
+    l_nfcText.setLocale("EN");
+    qDebug()<<"Text OK, appending to message";
     l_nfcMessage.append(l_nfcText);
+    emit tagTextOk();
 }
 
 

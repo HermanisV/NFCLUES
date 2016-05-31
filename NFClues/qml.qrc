@@ -14,7 +14,7 @@
         <file>Resources/star.png</file>
         <file>Items/MainMenu.qml</file>
         <file>Items/MapPopup.qml</file>
-        <file>Views/InitAdventure.qml</file>
         <file>Items/InitAdventure.qml</file>
+        <file>Forms/NfcManualWrite.qml</file>
     </qresource>
 </RCC>

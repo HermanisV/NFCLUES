@@ -7,9 +7,11 @@
 #include <QtDebug>
 #include <QString>
 #include <QNetworkAccessManager>
+#include <QAbstractListModel>
+#include <QStringList>
 #include "nfcdb.h"
 #include "nfcnetwork.h"
-
+#include "adventureonmapmodel.h"
 /* This class is used for handling all Adventure related data
  * New adventure craetion
  * Creating model from your adventures
@@ -35,7 +37,7 @@ public:
     Q_PROPERTY(double geoLong READ geoLong WRITE setGeoLong NOTIFY geoLongChanged)
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorChanged)
     Q_PROPERTY(int status READ status WRITE setStatus NOTIFY statusChanged)
-    Q_PROPERTY(QList<QObject *> adventuresOnMap READ adventuresOnMap NOTIFY adventuresOnMapChanged)
+    Q_PROPERTY(AdventureOnMapModel* adventuresOnMap READ adventuresOnMap NOTIFY adventuresOnMapChanged)
 
     //Getters
     int adventureId();
@@ -49,7 +51,7 @@ public:
     double geoLong();
     QString errorString();
     int     status();
-    QList<QObject *> adventuresOnMap();
+    AdventureOnMapModel *adventuresOnMap();
 
     //Setters
     void    setAdventureId(const int &adventureId);
@@ -103,8 +105,8 @@ private:
     int     l_status;
     QString l_error;
     QSqlDatabase l_db;
+    AdventureOnMapModel* l_adventuresOnMap;
     bool l_loading;
-    QList<QObject *> l_adventuresOnMap;
 };
 
 

@@ -7,15 +7,19 @@
 #include <QString>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QQmlApplicationEngine>
 #include <QNetworkReply>
 #include <QJsonDocument>
+#include <QAbstractListModel>
+#include <QQmlContext>
+#include <QStringList>
 #include "nfcdb.h"
 #include "nfcnetwork.h"
-#include "adventureonmapdata.h"
 
 AdventureHandler::AdventureHandler(QObject *parent) : QObject(parent)
 {
     connect(this,SIGNAL(gotError(QString)), this,SLOT(handleError(QString)));
+    l_adventuresOnMap = new AdventureOnMapModel(this);
 }
 
 int AdventureHandler::adventureId()
@@ -73,7 +77,7 @@ int AdventureHandler::status()
     return l_status;
 }
 
-QList<QObject *> AdventureHandler::adventuresOnMap()
+AdventureOnMapModel *AdventureHandler::adventuresOnMap()
 {
     return l_adventuresOnMap;
 }
@@ -478,8 +482,8 @@ void AdventureHandler::buildAdventuresOnMap()
         qDebug()<<"JSON object";
         QJsonObject resourceObj = doc.object();
         QJsonArray resourceInstance = resourceObj["resource"].toArray();
-
-
+        QQmlApplicationEngine engine;
+        //AdventureOnMapModel model;
         foreach (const QJsonValue & value, resourceInstance) {
             ///Loop reads as resource iterator
             QJsonObject valueObj = value.toObject();
@@ -493,8 +497,13 @@ void AdventureHandler::buildAdventuresOnMap()
             double geoLong = valueObj["Long"].toDouble();
             qDebug()<<"Got adevnture "<< adventureId << " - " << name;
             //build these loope terations as list of Qobject elements for adventures on map
-            l_adventuresOnMap.append(new AdventureOnMapData(adventureId, tagId, name, description, clue, award, geoLat, geoLong));
+
+            //AdventureOnMap(adventureId, tagId, name, description, clue, award, geoLat, geoLong);
+            l_adventuresOnMap->addAdventureOnMap(AdventureOnMap(adventureId, tagId, name, description, clue, award, geoLat, geoLong));
+
+            //l_adventuresOnMap.append(new AdventureOnMapData(adventureId, tagId, name, description, clue, award, geoLat, geoLong));
         }
+//        return &model;
 }
 
 void AdventureHandler::handleError(QString p_error)

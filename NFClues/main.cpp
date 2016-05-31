@@ -9,8 +9,9 @@
 #include "userhandler.h"
 #include "adventurehandler.h"
 #include "nfchandler.h"
-#include  "system.h"
-
+#include "system.h"
+#include "adventureonmapmodel.h"
+AdventureOnMapModel *g_adventuresOnMap;
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -24,6 +25,11 @@ int main(int argc, char *argv[])
     qmlRegisterType<NFCHandler>("NFCTag",0,1,"HandleTag");
     //TagHandler
     qmlRegisterType<System>("ThisSystem",0,1,"System");
+    //Map item model    
+    qmlRegisterType<AdventureOnMapModel>("AdventureOnMap", 0, 1, "AdventureOnMapModel");
+//    QQmlApplicationEngine engine;
+//    AdventureOnMapModel adventuresOnMap;
+//    engine.rootContext()->setContextProperty("AdventuresOnMapModel", &adventuresOnMap);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
