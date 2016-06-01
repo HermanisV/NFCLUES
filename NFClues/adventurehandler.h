@@ -87,13 +87,16 @@ signals:
     void gotAdventure();
     void completedAdventure();
     void updatedPoints();
+    void createdInit(const int p_adventureId);
     void gotInit();
     void error();\
     void errorChanged();
     void adventuresOnMapChanged();
+    void adventureOnMapAdded(double geoLat, double geoLong);
     //Slots
 protected slots:
     void handleError(QString p_error);
+    void addAdventureOnMap(const int p_adventureId);
 private:
     //User data
     int l_adventureId;

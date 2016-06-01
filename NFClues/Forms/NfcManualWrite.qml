@@ -33,7 +33,7 @@ Flickable{
         Rectangle{
             id: manualTagRct
             width: parent.width * 0.8
-            height: parent.height * 0.6
+            height: parent.height * 0.4
             color: "lightgray"
             anchors.top: manualNfcWriteRect.top
             anchors.topMargin: 16
@@ -49,7 +49,8 @@ Flickable{
                 anchors.top: parent.top
                 anchors.topMargin: parent.height * 0.1
                 font.pixelSize: 36
-                //validator: IntValidator
+                validator: DoubleValidator{}
+                maximumLength: 7
             }
 
             Label {

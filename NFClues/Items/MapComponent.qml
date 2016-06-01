@@ -70,6 +70,20 @@ Map {
         }
     }
     //Mouse area for all
+    MapQuickItem{
+        coordinate: positionSource.position.coordinate
+        //Anhors pointer right in the middle of bottom
+        anchorPoint.x: hereImage.width * 0.5
+        anchorPoint.y: hereImage.height
+
+        sourceItem: Column {
+            Image {
+                id: hereImage;
+                source: "../Resources/android-logo.png"
+            }
+        }
+    }
+
     MouseArea {
         id: mouseArea
         property variant lastCoordinate
@@ -90,7 +104,7 @@ Map {
                 map.lastY = mouse.y
             }
         }
-        onPressAndHold:{
+        onDoubleClicked:{
             if (Math.abs(map.pressX - mouse.x ) < map.threshold
                     && Math.abs(map.pressY - mouse.y ) < map.threshold) {
                 showPopupMenu(lastCoordinate);  //Send popup up to Main and showmenu

@@ -95,6 +95,9 @@ ApplicationWindow {
                 stackView.push({ item: Qt.resolvedUrl("Forms/NfcManualWrite.qml")})
                 stackView.currentItem.closeForm.connect(stackView.closeForm)
                 break
+            case "completeAdventure":
+                completeWindow.showComplete()
+                break
             default:
                 console.log("Unsupported action!")
             }
@@ -155,6 +158,7 @@ ApplicationWindow {
     Component {
         id: mapComponent
         MapComponent{
+            id: map
             width: page.width
             height: page.height
 
@@ -197,6 +201,15 @@ ApplicationWindow {
         onGotInit: {
             infoDialog.showInfo("Adventure initialized!")
         }
+        //Update main users data on complete adventure
+        onCompletedAdventure: {
+            mainUserHandle.getUserData(mainUserHandle.login)
+            infoDialog.showInfo("Adventure completed!")
+        }
+        onAdventureOnMapAdded: {
+            //Place map on new adventureLocation
+            map.center = QtPositioning.coordinate(thisAdvendture.geoLat,thisAdvendture.geoLong)
+        }
     }
     //QObject form nfchandler.h
     HandleTag{
@@ -222,6 +235,82 @@ ApplicationWindow {
 
     System{
         id: thisSystem
+    }
+
+    //Window for completing adventures
+    Window {
+        id: completeWindow
+        width: 380
+        height: 180
+        maximumHeight: 180
+        maximumWidth: 380
+        Rectangle{
+            id: completeRct
+            width: 380
+            height: 170
+            color: "transparent"
+            Text {
+                id: titleText
+                text: "Complete Adventure!"
+                anchors.top: parent.top
+                anchors.topMargin: 16
+                font.pointSize: 24
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+
+            TextField {
+                id: completeTagText
+                width: 230
+                anchors.top: titleText.bottom
+                anchors.topMargin: 24
+                anchors.right: titleText.right
+                anchors.rightMargin: 0
+                font.pointSize: 16
+                validator: IntValidator{}
+                maximumLength: 7
+            }
+
+            Text {
+                id: text1
+                x: 50
+                text: qsTr("Tag Id:")
+                anchors.top: completeTagText.top
+                anchors.topMargin: 0
+                anchors.right: completeTagText.left
+                anchors.rightMargin: 2
+                anchors.verticalCenter: completeTagText.verticalCenter
+                font.pointSize: 16
+            }
+
+            Button {
+                id: accButton
+                text: qsTr("Accept")
+                width: titleText.width * 0.6
+                anchors.top: completeTagText.bottom
+                anchors.topMargin: 24
+                anchors.right: titleText.right
+                anchors.rightMargin: 0
+                onClicked: {
+                    thisAdvendture.completeAdventure(completeTagText.text,mainUserHandle.userId)
+                }
+            }
+
+            Button {
+                id: cancButton
+                width: titleText.width * 0.3
+                text: qsTr("Close")
+                anchors.leftMargin: 0
+                anchors.topMargin: 0
+                anchors.left: titleText.left
+                anchors.top: accButton.top
+                onClicked: {
+                    completeWindow.close()
+                }
+            }
+        }
+        function showComplete() {
+            completeWindow.show();
+        }
     }
 
     MessageDialog {

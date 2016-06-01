@@ -31,7 +31,7 @@ public:
     Q_PROPERTY(int points READ points WRITE setPoints NOTIFY pointsChanged)
     Q_PROPERTY(int role READ role WRITE setRole/* NOTIFY roleChanged*/)
     Q_PROPERTY(QString errorString READ errorString/* NOTIFY ErrorChanged*/)
-    Q_PROPERTY(int place READ place/* WRITE setPlace NOTIFY placeChanged*/)
+    Q_PROPERTY(int place READ place WRITE setPlace NOTIFY placeChanged)
     Q_PROPERTY(QList<QObject *> leaderTable READ leaderTable NOTIFY leaderTableChanged)
     Q_PROPERTY(QList<QObject *> usersAdventuresTable READ usersAdventuresTable NOTIFY usersAdventuresTableChanged)
 
@@ -55,6 +55,7 @@ public:
     void    setPassword(const QString &password);
     void    setPoints(const int &points);
     void    setRole(const int &role);
+    void    setPlace(const int &place);
     //Methods
     //Registers new user
     Q_INVOKABLE void  createNewUser();
@@ -77,6 +78,7 @@ signals:
     void error();
     void startLoading();
     void endLoading();
+    void placeChanged();
 
     //Slots
 protected slots:

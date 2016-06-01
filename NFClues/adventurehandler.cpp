@@ -20,6 +20,7 @@
 AdventureHandler::AdventureHandler(QObject *parent) : QObject(parent)
 {
     connect(this,SIGNAL(gotError(QString)), this,SLOT(handleError(QString)));
+    connect(this,SIGNAL(createdInit(int)), this, SLOT(addAdventureOnMap(int)));
     l_adventuresOnMap = new AdventureOnMapModel(this);
 }
 
@@ -429,6 +430,7 @@ void AdventureHandler::initAdventure(const int p_adventureId,const int p_tagId,c
                 {
                     qDebug() << "Upadted";
                     l_db.close();
+                    emit createdInit(p_adventureId);
                     emit gotInit();
                 }
             }
@@ -529,7 +531,8 @@ void AdventureHandler::completeAdventure(const int p_tagId, const int p_userId)
                 qDebug() << "Got adventure under tag";
                 int adventureId;
                 adventureId = validateFetch.value(0).toInt();
-                validateQuerry = QString("select 1 from Done_Adventures where User_id =%1 and Adventure_id = %2;");
+                validateQuerry = QString("select 1 from Done_Adventures where User_id =%1 and Adventure_id = %2;").arg(p_userId).arg(adventureId);
+                qDebug() << "Querry "<< validateQuerry;
                 if (validateFetch.exec(validateQuerry))
                 {
                     if (validateFetch.next()) {
@@ -539,7 +542,7 @@ void AdventureHandler::completeAdventure(const int p_tagId, const int p_userId)
                     }
                     else{
                         QSqlQuery doAdventure(l_db);
-                        QString updateUserPoints = QString("update users set Points = (select award from Adventures where Adventure_id = %1) where User_id = %2;").arg(adventureId).arg(p_userId); //increase users pooints with this adventures points
+                        QString updateUserPoints = QString("update users set Points =(select Points from Users where User_id = %2) + (select award from Adventures where Adventure_id = %1) where User_id = %2;").arg(adventureId).arg(p_userId); //increase users pooints with this adventures points
                         qDebug() << "Update: "<< updateUserPoints;
                         if (doAdventure.exec(updateUserPoints))
                         {
@@ -596,4 +599,13 @@ void AdventureHandler::handleError(QString p_error)
         l_error = p_error;
         emit error();
     }
+}
+
+void AdventureHandler::addAdventureOnMap(const int p_adventureId)
+{
+ getAdventureData(p_adventureId);
+ l_adventuresOnMap->addAdventureOnMap(AdventureOnMap(l_adventureId, l_tagId, l_name, l_desc, l_clue, l_award, l_geoLat, l_geoLong));
+ qDebug()<< "Added "<<l_adventureId<<" on Map";
+ emit adventuresOnMapChanged();
+ emit adventureOnMapAdded(l_geoLat,l_geoLong);
 }

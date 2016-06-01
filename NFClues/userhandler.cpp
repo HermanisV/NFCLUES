@@ -119,6 +119,7 @@ void UserHandler::setPoints(const int &points)
     else
     {
         l_points = points;
+        emit pointsChanged();
     }
 }
 
@@ -131,6 +132,19 @@ void UserHandler::setRole(const int &role)
     else
     {
         l_role = role;
+    }
+}
+
+void UserHandler::setPlace(const int &place)
+{
+    if (place == l_place)
+    {
+        return;
+    }
+    else
+    {
+        l_place = place;
+        emit placeChanged();
     }
 }
 
@@ -264,12 +278,16 @@ bool UserHandler::getUserData(QString p_login)
         {
             if (userFullFetch.next()) {
                 qDebug() << "User by id found";
-                l_userId = userFullFetch.value(0).toInt();
-                l_login  = userFullFetch.value(1).toString();
-                l_email  = userFullFetch.value(4).toString();
-                l_points = userFullFetch.value(5).toInt();
-                l_role   = userFullFetch.value(6).toInt();
-                l_place  = userFullFetch.value(8).toInt();
+                setUserId(userFullFetch.value(0).toInt());
+                setLogin(userFullFetch.value(1).toString());
+                setEmail(userFullFetch.value(4).toString());
+                setPoints(userFullFetch.value(5).toInt());
+                setRole(userFullFetch.value(6).toInt());
+                //l_login  = userFullFetch.value(1).toString();
+                //l_email  = userFullFetch.value(4).toString();
+                //l_points = userFullFetch.value(5).toInt();
+                //l_role   = userFullFetch.value(6).toInt();
+               setPlace(userFullFetch.value(8).toInt());
 
                 qDebug() << "l_login "<< l_login;
                 qDebug() << "l_userId "<< l_userId;

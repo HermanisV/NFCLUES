@@ -16,5 +16,7 @@
         <file>Items/MapPopup.qml</file>
         <file>Items/InitAdventure.qml</file>
         <file>Forms/NfcManualWrite.qml</file>
+        <file>Items/CompleteAdventure.qml</file>
+        <file>Resources/android-logo.png</file>
     </qresource>
 </RCC>

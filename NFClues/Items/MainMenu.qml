@@ -22,6 +22,8 @@ MenuBar {
                 item.triggered.connect(function(){selectAction("createAdventures")})
                 item = addItem(qsTr("Leaderboards"));
                 item.triggered.connect(function(){selectAction("leaderboards")})
+                item = addItem(qsTr("Complete Adventure"));
+                item.triggered.connect(function(){selectAction("completeAdventure")})
             }
             else{
                 if (sys.indexOf("win")>=0){
