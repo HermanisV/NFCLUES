@@ -15,6 +15,7 @@ UserHandler::UserHandler(QObject *parent) : QObject(parent)
     connect(this,SIGNAL(gotLogin()), this,SLOT(buildLeaderboard()));
     connect(this,SIGNAL(gotLogin()), this,SLOT(buildUsersAdventureTable()));
     connect(this,SIGNAL(gotLogin()), this,SLOT(buildUsersDoneAdventuresTable()));
+    connect(this,SIGNAL(deletedAdventure()), this,SLOT(buildUsersAdventureTable()));
 }
 
 int UserHandler::userId()
@@ -157,6 +158,19 @@ void UserHandler::setPlace(const int &place)
 void UserHandler::createNewUser()
 {
     qDebug() << "In UserHandler.createNewUser";
+    ///Validate
+    if (l_login.isNull() || l_login.length() < 6){
+        gotError("No login specified or it is too short");
+        return;
+    }
+    if (l_email.isNull() || !l_email.contains("@")){
+        gotError("No email specified, or it is not an email");
+        return;
+    }
+    if (l_password.isNull() || l_password.length() < 6){
+        gotError("No password spedcified or it is to short");
+        return;
+    }
 
     NfcDb DB;
     l_db = DB.getDB();
@@ -219,7 +233,17 @@ void UserHandler::createNewUser()
 
 void UserHandler::loginUser(QString p_login, QString p_pass)
 {
-    qDebug() << "In UserHandler.loginUser";   
+    qDebug() << "In UserHandler.loginUser";
+
+    if (p_login.isNull()){
+        gotError("No login specified");
+        return;
+    }
+    if (p_pass.isNull()){
+        gotError("No password spedcified");
+        return;
+    }
+
     NfcDb DB;
     l_db = DB.getDB();
     if (l_db.open())
@@ -270,7 +294,7 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
         l_db.close();
         emit endLoading();
         gotError("Ooops, there seems to be a problem");
-    }    
+    }
     emit endLoading();
 }
 
@@ -299,7 +323,7 @@ bool UserHandler::getUserData(QString p_login)
                 //l_email  = userFullFetch.value(4).toString();
                 //l_points = userFullFetch.value(5).toInt();
                 //l_role   = userFullFetch.value(6).toInt();
-               setPlace(userFullFetch.value(8).toInt());
+                setPlace(userFullFetch.value(8).toInt());
 
                 qDebug() << "l_login "<< l_login;
                 qDebug() << "l_userId "<< l_userId;
@@ -346,6 +370,75 @@ void UserHandler::addDoneAdventureToList(int p_adventureId, QString p_name, int 
     emit usersDoneAdventuresTable();
 }
 
+bool UserHandler::deleteAdventure(int p_userId, int p_adventureId)
+{
+    NfcDb DB;
+    l_db = DB.getDB();
+    if (l_db.open())
+    {
+        qDebug() << "l_db connection opened.";
+        QSqlQuery validateFetch(l_db);
+        //Check if user is role 2(admin) or if he is the owner of the adventure
+        QString validateQuerry = QString("select us.role, ad.owner_Id from Adventures ad, Users us where us.User_id = %1 and ad.Adventure_id = %2").arg(p_userId).arg(p_adventureId);
+        qDebug() << "Querry: "<<validateQuerry;
+        if (validateFetch.exec(validateQuerry))
+        {
+            if (validateFetch.next()) {
+                qDebug() << "Validate record found";
+                if ((validateFetch.value(0).toInt()) != 2 && (validateFetch.value(1).toInt()) != p_userId){
+                    qDebug() << "User cannot delete this";
+                    l_db.close();
+                    gotError("Sorry you don't have permission to delete this");
+                }
+                else{
+                    QSqlQuery deleteAdventure(l_db);
+                    QString deleteDoneAdventure = QString("delete from Done_Adventures where Adventure_id = %1;").arg(p_adventureId);
+                    qDebug() << "Delete: "<< deleteDoneAdventure;
+                    if (deleteAdventure.exec(deleteDoneAdventure))
+                    {
+                        qDebug() << "Deleted done adventures";
+                    }
+                    QString deleteThisAdventure = QString("delete from Adventures where Adventure_id = %1;").arg(p_adventureId);
+                    qDebug() << "Delete: "<< deleteThisAdventure;
+                    if (deleteAdventure.exec(deleteThisAdventure))
+                    {
+                        qDebug() << "Deleted this adventure";
+                    }
+                    emit deletedAdventure();
+                    return true;
+                }
+            }
+            else
+            {
+                qDebug() << "role or this user not found";
+                qDebug() << "Closing connection";
+                l_db.close();
+                gotError("Ooops, there seems to be a problem");
+                return false;
+            }
+        }
+        else
+        {
+            qDebug() << "Error happened - " << l_db.lastError().text();
+            qDebug() << "Closing connection";
+            l_db.close();
+            emit endLoading();
+            gotError("Ooops, there seems to be a problem");
+            return false;
+        }
+    }
+    else
+    {
+        qDebug() << "Error happened - " << l_db.lastError().text();
+        qDebug() << "Closing connection";
+        l_db.close();
+        emit endLoading();
+        gotError("Ooops, there seems to be a problem");
+        return false;
+    }
+    return false;
+}
+
 void UserHandler::handleError(QString p_error)
 {
     qDebug() << "Error happened";
@@ -378,7 +471,7 @@ void UserHandler::buildLeaderboard()
         {
             while (leaderFetch.next()) {
                 l_leaderTable.append(new LeaderboardData(leaderFetch.value(0).toInt(), leaderFetch.value(1).toString(),leaderFetch.value(2).toInt()));
-                 qDebug() << "Querry  got user: "<<leaderFetch.value(1).toString();
+                qDebug() << "Querry  got user: "<<leaderFetch.value(1).toString();
             }
             l_db.close();
         }
@@ -401,7 +494,7 @@ void UserHandler::buildUsersAdventureTable(int user_id)
     }
     NfcDb DB;
     l_db = DB.getDB();
-
+    l_userAdventureTable.clear();
     if (l_db.open())
     {
         qDebug() << "DB connection opened.";
@@ -413,7 +506,7 @@ void UserHandler::buildUsersAdventureTable(int user_id)
         {
             while (adventureFetch.next()) {
                 l_userAdventureTable.append(new AdventureOnUserData(adventureFetch.value(0).toInt(), adventureFetch.value(1).toString(),adventureFetch.value(2).toInt(),adventureFetch.value(3).toInt(),adventureFetch.value(4).toString(),adventureFetch.value(5).toString()));
-                 qDebug() << "Querry  got adventure: "<<adventureFetch.value(1).toString();
+                qDebug() << "Querry  got adventure: "<<adventureFetch.value(1).toString();
             }
             l_db.close();
         }
@@ -426,6 +519,7 @@ void UserHandler::buildUsersAdventureTable(int user_id)
         }
     }
     qDebug() << "Done fetching";
+    emit usersAdventuresTableChanged();
 }
 
 void UserHandler::buildUsersDoneAdventuresTable(int user_id)
@@ -448,7 +542,7 @@ void UserHandler::buildUsersDoneAdventuresTable(int user_id)
         {
             while (adventureFetch.next()) {
                 l_userDoneAdventureTable.append(new AdventureOnUserData(adventureFetch.value(0).toInt(), adventureFetch.value(1).toString(),adventureFetch.value(2).toInt(),adventureFetch.value(3).toInt(),adventureFetch.value(4).toString(),adventureFetch.value(5).toString()));
-                 qDebug() << "Querry  got adventure: "<<adventureFetch.value(1).toString();
+                qDebug() << "Querry  got adventure: "<<adventureFetch.value(1).toString();
             }
             l_db.close();
         }

@@ -20,7 +20,6 @@
 AdventureHandler::AdventureHandler(QObject *parent) : QObject(parent)
 {
     connect(this,SIGNAL(gotError(QString)), this,SLOT(handleError(QString)));
-    connect(this,SIGNAL(createdInit(int)), this, SLOT(addAdventureOnMap(int)));
     l_adventuresOnMap = new AdventureOnMapModel(this);
 }
 
@@ -365,6 +364,7 @@ int AdventureHandler::getRandomTagId()
                     if (tagIdChech.value(0).toInt() == 0){
                         qDebug()<< "Found unique Tag id as: "<<randomTagId;
                         isTaken = false;
+                        return randomTagId;
                     }
                 }
                 else{

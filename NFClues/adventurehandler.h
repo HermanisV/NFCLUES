@@ -66,12 +66,20 @@ public:
     void    setStatus(const int &status);
 
     //Methods
+    //Creates New adventure from read object data and parameter owner
     Q_INVOKABLE void  createNewAdventure(const int ownerId);
+    //Fills object data with adventure under this ID
     Q_INVOKABLE void  getAdventureData(const int p_adventureId);
+    //Makes random tag id's while it gets ia new one
     Q_INVOKABLE int  getRandomTagId();
+    //Initialises adventure
     Q_INVOKABLE void initAdventure(const int p_adventureId, const int p_tagId, const double p_lat, const double p_long);
+    //Builds adventureOnMap model
     Q_INVOKABLE void buildAdventuresOnMap();
+    //Completes adventure
     Q_INVOKABLE void completeAdventure(const int p_tagId, const int p_userId);
+    //Adds newely initialized adventure to the adventure on map model
+    Q_INVOKABLE void addAdventureOnMap(const int p_adventureId);
     //Signals
 signals:
     void adventureIdChanged();
@@ -96,7 +104,6 @@ signals:
     //Slots
 protected slots:
     void handleError(QString p_error);
-    void addAdventureOnMap(const int p_adventureId);
 private:
     //User data
     int l_adventureId;

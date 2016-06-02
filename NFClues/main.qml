@@ -183,7 +183,7 @@ ApplicationWindow {
     HandleUser{
         id: mainUserHandle
         property bool userOK: false
-        property bool loading: false
+        property bool loading: false        
         onError: {
             console.log("There was an Error: " + errorString)
             errorDialog.showError(errorString)

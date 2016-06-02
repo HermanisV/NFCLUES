@@ -6,7 +6,9 @@ import NFCUser 0.1
 
 Flickable{
     signal closeForm()
+    signal deletedAdventure()
     property string ownerUserLogin
+    property string ownerId
     property int    thisAdventureId
     property string thisAdventureName
     property string thisAdventureDesc
@@ -16,6 +18,7 @@ Flickable{
     property bool canInit : false   //can it be initilised
     property bool isOwner : false   //is caller Owner
     property bool fromMap : false   //is it called form Map
+    property bool isAdmin : false
 
     id: bigFlick
     width: Screen.width
@@ -137,21 +140,21 @@ Flickable{
                     onClicked: closeForm()
                 }
 
-//                Button {
-//                    id: editButton
-//                    Layout.fillHeight: true
-//                    Layout.minimumWidth: parent.width * 0.24
-//                    text: qsTr("Edit")
-//                    onClicked: {
-//                        console.log("Clicked edit")
-//                    }
-//                }
+                //                Button {
+                //                    id: editButton
+                //                    Layout.fillHeight: true
+                //                    Layout.minimumWidth: parent.width * 0.24
+                //                    text: qsTr("Edit")
+                //                    onClicked: {
+                //                        console.log("Clicked edit")
+                //                    }
+                //                }
 
                 Button {
                     id: btnInit
                     visible: canInit && isOwner
                     Layout.fillHeight: true
-                    Layout.minimumWidth: parent.width * 0.75
+                    Layout.minimumWidth: parent.width * 0.35
                     text: qsTr("Initialise")
                     onClicked: {
                         console.log("Clicked init")
@@ -162,13 +165,17 @@ Flickable{
                 }
 
                 Button {
-                    id: btnComplete
-                    visible: (!(canInit && isOwner) && mainUserHandle.userOK)
+                    id: btnDelete
+                    visible: ((isOwner || isAdmin) && mainUserHandle.userOK)
                     Layout.fillHeight: true
-                    Layout.minimumWidth: parent.width * 0.75
-                    text: qsTr("Complete")
+                    Layout.minimumWidth: parent.width * 0.35
+                    text: qsTr("Delete")
                     onClicked: {
-                        console.log("Clicked complete")
+                        console.log("Clicked delete")
+                        if (mainUserHandle.deleteAdventure(ownerId, thisAdventureId)){
+                            deletedAdventure()
+                            closeForm()
+                        }
                     }
                 }
             }

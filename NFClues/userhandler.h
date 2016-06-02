@@ -69,6 +69,8 @@ public:
     Q_INVOKABLE void  addAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status, QString p_desc, QString p_clue);
     //Used to add the newley completed adventure to the l_userDoneAdventureTable, so it doesn't have to be build a new altogether
     Q_INVOKABLE void  addDoneAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status, QString p_desc, QString p_clue);
+    //Used to delete advventure and all its related recods
+    Q_INVOKABLE bool  deleteAdventure(int p_userId, int p_adventureId);
 
     //Signals
 signals:
@@ -82,6 +84,7 @@ signals:
     void error();
     void startLoading();
     void endLoading();
+    void deletedAdventure();
     void placeChanged();
 
     //Slots
@@ -90,7 +93,6 @@ protected slots:
     void buildLeaderboard();
     void buildUsersAdventureTable(int user_id = NULL);
     void buildUsersDoneAdventuresTable(int user_id = NULL);
-
 private:
     //User data
     int     l_userId;

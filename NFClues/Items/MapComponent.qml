@@ -52,8 +52,20 @@ Map {
                 id: mapItemMouse
                 height: image.height * 2
                 width: image.width * 2
-                onClicked: {
+                onClicked: {                    
                     console.log("Clicked adventure " + adventureId)
+                    ///Translate user role
+                    var isAdmin
+                    switch (mainUserHandle.role) {
+                    case 1:
+                        isAdmin = false
+                        break
+                    case 2:
+                        isAdmin = true
+                        break
+                    default:
+                        console.log("Unsupported status!")
+                    }
                     //Open this adventures page
                     //Vibrator.vibrate(100)//currently crashing the app
                     stackView.push({ item: Qt.resolvedUrl("../Views/SeeAdventure.qml") ,
@@ -63,6 +75,7 @@ Map {
                                            "thisAdventureClue"  :   clue,
                                            "thisAdventureAward" :   award,
                                            "thisAdventureInit"  :   true,
+                                           "isAdmin"            :   isAdmin,
                                            "fromMap"            :   true}})
                     stackView.currentItem.closeForm.connect(stackView.backForm)
                 }

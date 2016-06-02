@@ -54,7 +54,7 @@ Flickable{
             TableView {
                 id:tblUsersAdventures
                 anchors.fill: parent
-                model: mainUserHandle.usersDoneAdventuresTable
+                model: mainUserHandle.usersAdventuresTable
                 TableViewColumn {
                     id: colAdventure
                     role: "name"
@@ -82,17 +82,35 @@ Flickable{
                     default:
                         console.log("Unsupported status!")
                     }
+                    ///Translate user role
+                    var isAdmin
+                    switch (mainUserHandle.role) {
+                    case 1:
+                        isAdmin = false
+                        break
+                    case 2:
+                        isAdmin = true
+                        break
+                    default:
+                        console.log("Unsupported status!")
+                    }
                     stackView.push({ item: Qt.resolvedUrl("../Views/SeeAdventure.qml") ,
                                        properties: { "ownerUserLogin"  : mainUserHandle.login,
                                            "thisAdventureName"  :   model[currentRow].name,
                                            "thisAdventureDesc"  :   model[currentRow].desc,
                                            "thisAdventureClue"  :   model[currentRow].clue,
                                            "thisAdventureAward" :   model[currentRow].award,
+                                           "ownerId"            :   mainUserHandle.userId,
                                            "canInit"            :   canInit,
                                            "isOwner"            :   true,
+                                           "isAdmin"            :   isAdmin,
                                            "thisAdventureId"    :   model[currentRow].adventureId}})
                     stackView.currentItem.closeForm.connect(stackView.backForm)
+                    stackView.currentItem.deletedAdventure.connect(tblUsersAdventures.resetModel)
                 }
+                function resetModel(){
+                tblUsersAdventures.model = mainUserHandle.usersAdventuresTable
+            }
             }
 
             Button {
