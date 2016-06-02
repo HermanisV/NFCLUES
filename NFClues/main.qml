@@ -221,6 +221,7 @@ ApplicationWindow {
         onAdventureOnMapAdded: {
             //Place map on new adventureLocation
             map.center = QtPositioning.coordinate(thisAdvendture.geoLat,thisAdvendture.geoLong)
+            stackView.closeForm
         }
     }
     //QObject form nfchandler.h
@@ -304,6 +305,7 @@ ApplicationWindow {
                 anchors.rightMargin: 0
                 onClicked: {
                     thisAdvendture.completeAdventure(completeTagText.text,mainUserHandle.userId)
+                    //Add it on the list of completed adventures
                     mainUserHandle.addDoneAdventureToList(thisAdvendture.adventureId, thisAdvendture.name, thisAdvendture.award, 2,thisAdvendture.desc, thisAdvendture.clue)
 
                 }

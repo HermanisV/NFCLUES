@@ -92,6 +92,7 @@ void AdventureHandler::setAdventureId(const int &adventureId)
     else
     {
         l_adventureId = adventureId;
+        emit adventuresOnMapChanged();
     }
 }
 
@@ -116,6 +117,7 @@ void AdventureHandler::setTagId(const int &tagId)
     else
     {
         l_tagId = tagId;
+        emit tagIdChanged();
     }
 
 }
@@ -129,6 +131,7 @@ void AdventureHandler::setName(const QString &name)
     else
     {
         l_name = name;
+        emit nameChanged();
     }
 }
 
@@ -141,6 +144,7 @@ void AdventureHandler::setDesc(const QString &desc)
     else
     {
         l_desc = desc;
+        emit descChanged();
     }
 }
 
@@ -153,6 +157,7 @@ void AdventureHandler::setClue(const QString &clue)
     else
     {
         l_clue = clue;
+        emit clueChanged();
     }
 }
 
@@ -165,6 +170,7 @@ void AdventureHandler::setAward(const int &award)
     else
     {
         l_award = award;
+        emit awardChanged();
     }
 }
 
@@ -177,6 +183,7 @@ void AdventureHandler::setGeoLat(const double &geoLat)
     else
     {
         l_geoLat = geoLat;
+        emit geoLatChanged();
     }
 }
 
@@ -189,6 +196,7 @@ void AdventureHandler::setGeoLong(const double &geoLong)
     else
     {
         l_geoLong = geoLong;
+        emit geoLongChanged();
     }
 }
 
@@ -201,6 +209,7 @@ void AdventureHandler::setStatus(const int &status)
     else
     {
         l_status = status;
+        emit statusChanged();
     }
 }
 
@@ -312,16 +321,16 @@ void AdventureHandler::getAdventureData(const int p_adventureId)
         {
             if (adventureFullFetch.next()) {
                 qDebug() << "User by id found";
-                l_adventureId = adventureFullFetch.value(0).toInt();
-                l_ownerId = adventureFullFetch.value(1).toInt();
-                l_tagId = adventureFullFetch.value(2).toInt();
-                l_name = adventureFullFetch.value(3).toString();
-                l_desc = adventureFullFetch.value(4).toString();
-                l_clue = adventureFullFetch.value(5).toString();
-                l_award = adventureFullFetch.value(5).toInt();
-                l_geoLat = adventureFullFetch.value(6).toDouble();
-                l_geoLong = adventureFullFetch.value(7).toDouble();
-                l_status = adventureFullFetch.value(8).toInt();
+                setAdventureId(adventureFullFetch.value(0).toInt());
+                setOwnerId(adventureFullFetch.value(1).toInt());
+                setTagId(adventureFullFetch.value(2).toInt());
+                setName(adventureFullFetch.value(3).toString());
+                setDesc(adventureFullFetch.value(4).toString());
+                setClue(adventureFullFetch.value(5).toString());
+                setAward(adventureFullFetch.value(5).toInt());
+                setGeoLat(adventureFullFetch.value(6).toDouble());
+                setGeoLong(adventureFullFetch.value(7).toDouble());
+                setStatus(adventureFullFetch.value(8).toInt());
                 l_db.close();
                 return;
             }
@@ -404,6 +413,10 @@ void AdventureHandler::initAdventure(const int p_adventureId,const int p_tagId,c
         gotError("No Lattitude passed");
     if (p_long == NULL)
         gotError("No Longituce passed");
+    if (p_lat < -90 || p_lat> 90)
+        gotError("Cordinate covers from from -90 to 90");
+    if (p_long < -90 || p_long> 90)
+        gotError("Cordinate covers from from -90 to 90");
 
     NfcDb DB;
     l_db = DB.getDB();

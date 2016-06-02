@@ -141,7 +141,7 @@ Flickable{
                     onClicked: {
                         console.log("Clicked init")
                         thisAdvendture.initAdventure(thisAdventureId, tagId.text, tagLat.text, tagLong.text)
-                        thisAdventure.addAdventureOnMap(thisAdventureId)
+                        thisAdvendture.addAdventureOnMap(thisAdventureId)
                         closeForm()
                     }
                 }

@@ -54,7 +54,7 @@ Flickable{
                 height: Screen.height * 0.07
                 font.pixelSize: 36
                 placeholderText: "Password"
-                echoMode: TextInput.PasswordEchoOnEdit
+                echoMode: TextInput.Password
             }
         }
 
