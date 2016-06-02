@@ -34,6 +34,7 @@ public:
     Q_PROPERTY(int place READ place WRITE setPlace NOTIFY placeChanged)
     Q_PROPERTY(QList<QObject *> leaderTable READ leaderTable NOTIFY leaderTableChanged)
     Q_PROPERTY(QList<QObject *> usersAdventuresTable READ usersAdventuresTable NOTIFY usersAdventuresTableChanged)
+    Q_PROPERTY(QList<QObject *> usersDoneAdventuresTable READ usersDoneAdventuresTable NOTIFY usersDoneAdventuresTableChanged)
 
     //Getters
     int     userId();
@@ -47,6 +48,7 @@ public:
     QSqlDatabase db();
     QList<QObject *> leaderTable();
     QList<QObject *> usersAdventuresTable();
+    QList<QObject *> usersDoneAdventuresTable();
 
     //Setters
     void    setUserId(const int &userId);
@@ -63,16 +65,18 @@ public:
     Q_INVOKABLE void  loginUser(QString p_login, QString p_pass);
     //Fetches and fills objects data with user under this login
     Q_INVOKABLE bool  getUserData(QString p_login);
-    //Used to add the newley created adventure to the l_userAdventureTable, s it doesn't have to be nuild a new altogether
+    //Used to add the newley created adventure to the l_userAdventureTable, so it doesn't have to be build a new altogether
     Q_INVOKABLE void  addAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status, QString p_desc, QString p_clue);
-    //Used yo get data for specific slected adventure for l_userAdventureTable
-//    Q_INVOKABLE QVariant getAdventureRecord(int p_index);
+    //Used to add the newley completed adventure to the l_userDoneAdventureTable, so it doesn't have to be build a new altogether
+    Q_INVOKABLE void  addDoneAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status, QString p_desc, QString p_clue);
+
     //Signals
 signals:
     void userIdChanged();
     void pointsChanged();
     void leaderTableChanged();
     void usersAdventuresTableChanged();
+    void usersDoneAdventuresTableChanged();
     void gotLogin();
     void gotError(QString);
     void error();
@@ -85,6 +89,7 @@ protected slots:
     void handleError(QString p_error);
     void buildLeaderboard();
     void buildUsersAdventureTable(int user_id = NULL);
+    void buildUsersDoneAdventuresTable(int user_id = NULL);
 
 private:
     //User data
@@ -99,6 +104,7 @@ private:
     QSqlDatabase l_db;
     QList<QObject *>  l_leaderTable;
     QList<QObject *>  l_userAdventureTable;
+    QList<QObject *>  l_userDoneAdventureTable;
     bool    l_loading;
 };
 

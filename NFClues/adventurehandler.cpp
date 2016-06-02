@@ -365,7 +365,6 @@ int AdventureHandler::getRandomTagId()
                     if (tagIdChech.value(0).toInt() == 0){
                         qDebug()<< "Found unique Tag id as: "<<randomTagId;
                         isTaken = false;
-                        return randomTagId;
                     }
                 }
                 else{
@@ -389,7 +388,8 @@ int AdventureHandler::getRandomTagId()
         qDebug() << "Closing connection";
         l_db.close();
         gotError("Ooops, there seems to be a problem");
-    }
+    }    
+    return 0;
 }
 
 void AdventureHandler::initAdventure(const int p_adventureId,const int p_tagId,const double p_lat,const double p_long)
@@ -554,6 +554,8 @@ void AdventureHandler::completeAdventure(const int p_tagId, const int p_userId)
                         if (doAdventure.exec(insertAsDone))
                         {
                             qDebug() << "Inserted";
+                            //Sets this as the currect this adventure
+                            getAdventureData(adventureId);
                             emit completedAdventure();
                         }
                     }
@@ -592,6 +594,7 @@ void AdventureHandler::handleError(QString p_error)
     qDebug() << "Error happened";
     if (p_error == l_error)
     {
+        emit error();
         return;
     }
     else

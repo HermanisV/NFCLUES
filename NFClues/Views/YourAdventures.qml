@@ -54,7 +54,7 @@ Flickable{
             TableView {
                 id:tblUsersAdventures
                 anchors.fill: parent
-                model: mainUserHandle.usersAdventuresTable
+                model: mainUserHandle.usersDoneAdventuresTable
                 TableViewColumn {
                     id: colAdventure
                     role: "name"

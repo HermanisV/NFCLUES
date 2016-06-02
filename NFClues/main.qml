@@ -18,6 +18,7 @@ ApplicationWindow {
     //Props
     property bool userOK: false
     property variant map
+    property bool isLoading: false
     //Methods
     function createMap()
     {
@@ -128,6 +129,11 @@ ApplicationWindow {
             stackView.push({ item: Qt.resolvedUrl("Views/YourAdventures.qml")})
             stackView.currentItem.closeForm.connect(stackView.closeForm)
         }
+        BusyIndicator {
+            id: busyIndicator
+            anchors.centerIn: parent
+            running: isLoading || mapComponent.status == mapComponent.Loading
+        }
     }
 
     MapPopup {
@@ -185,6 +191,12 @@ ApplicationWindow {
         onGotLogin: {
             userOK = true
             mainMenu.actionMenu.createMenu(userOK)
+        }
+        onStartLoading: {
+            isLoading = true
+        }
+        onEndLoading: {
+            isLoading = false
         }
     }
     //QObject from adventurehandler.h
@@ -292,6 +304,8 @@ ApplicationWindow {
                 anchors.rightMargin: 0
                 onClicked: {
                     thisAdvendture.completeAdventure(completeTagText.text,mainUserHandle.userId)
+                    mainUserHandle.addDoneAdventureToList(thisAdvendture.adventureId, thisAdvendture.name, thisAdvendture.award, 2,thisAdvendture.desc, thisAdvendture.clue)
+
                 }
             }
 
@@ -336,11 +350,5 @@ ApplicationWindow {
         function autoClose(){
             infoDialog.close();
         }
-    }
-
-    BusyIndicator {
-        id: busyIndicator
-        anchors.centerIn: parent
-        running: false
     }
 }

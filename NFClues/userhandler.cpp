@@ -14,6 +14,7 @@ UserHandler::UserHandler(QObject *parent) : QObject(parent)
     connect(this,SIGNAL(gotError(QString)), this,SLOT(handleError(QString)));
     connect(this,SIGNAL(gotLogin()), this,SLOT(buildLeaderboard()));
     connect(this,SIGNAL(gotLogin()), this,SLOT(buildUsersAdventureTable()));
+    connect(this,SIGNAL(gotLogin()), this,SLOT(buildUsersDoneAdventuresTable()));
 }
 
 int UserHandler::userId()
@@ -64,6 +65,11 @@ QList<QObject *> UserHandler::leaderTable()
 QList<QObject *> UserHandler::usersAdventuresTable()
 {
     return l_userAdventureTable;
+}
+
+QList<QObject *> UserHandler::usersDoneAdventuresTable()
+{
+    return l_userDoneAdventureTable;
 }
 
 void UserHandler::setUserId(const int &userId)
@@ -218,6 +224,7 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
     l_db = DB.getDB();
     if (l_db.open())
     {
+        emit startLoading();
         qDebug() << "l_db connection opened.";
         QSqlQuery UserFetch(l_db);
         //Check for existing user under this login pass combination
@@ -233,6 +240,7 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
                     qDebug() << "Got Logon data";
                     emit gotLogin();
                     qDebug() << "Back from loginUser";
+                    emit endLoading();
                     return;
                 }
             }
@@ -242,6 +250,7 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
                 qDebug() << "Login and pass combination is incorrect";
                 qDebug() << "Closing connection";
                 l_db.close();
+                emit endLoading();
                 gotError("Wrong login");
             }
         }
@@ -250,6 +259,7 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
             qDebug() << "Error happened - " << l_db.lastError().text();
             qDebug() << "Closing connection";
             l_db.close();
+            emit endLoading();
             gotError("Ooops, there seems to be a problem");
         }
     }
@@ -258,8 +268,10 @@ void UserHandler::loginUser(QString p_login, QString p_pass)
         qDebug() << "Error happened - " << l_db.lastError().text();
         qDebug() << "Closing connection";
         l_db.close();
+        emit endLoading();
         gotError("Ooops, there seems to be a problem");
-    }
+    }    
+    emit endLoading();
 }
 
 bool UserHandler::getUserData(QString p_login)
@@ -327,11 +339,19 @@ void UserHandler::addAdventureToList(int p_adventureId, QString p_name, int p_aw
     emit usersAdventuresTableChanged();
 }
 
+void UserHandler::addDoneAdventureToList(int p_adventureId, QString p_name, int p_award, int p_status, QString p_desc, QString p_clue)
+{
+    qDebug()<<"In UserHandler.addDoneAdventureToList";
+    l_userDoneAdventureTable.append(new AdventureOnUserData(p_adventureId, p_name,p_award,p_status,p_desc,p_clue));
+    emit usersDoneAdventuresTable();
+}
+
 void UserHandler::handleError(QString p_error)
 {
     qDebug() << "Error happened";
     if (p_error == l_error)
     {
+        emit error();
         return;
     }
     else
@@ -393,6 +413,41 @@ void UserHandler::buildUsersAdventureTable(int user_id)
         {
             while (adventureFetch.next()) {
                 l_userAdventureTable.append(new AdventureOnUserData(adventureFetch.value(0).toInt(), adventureFetch.value(1).toString(),adventureFetch.value(2).toInt(),adventureFetch.value(3).toInt(),adventureFetch.value(4).toString(),adventureFetch.value(5).toString()));
+                 qDebug() << "Querry  got adventure: "<<adventureFetch.value(1).toString();
+            }
+            l_db.close();
+        }
+        else
+        {
+            qDebug() << "Error happened - " << l_db.lastError().text();
+            qDebug() << "Closing connection";
+            l_db.close();
+            gotError("Ooops, there seems to be a problem");
+        }
+    }
+    qDebug() << "Done fetching";
+}
+
+void UserHandler::buildUsersDoneAdventuresTable(int user_id)
+{
+    qDebug() << "In UserHandler.buildUsersDoneAdventuresTable";
+    if (user_id == NULL) {
+        user_id = l_userId;
+    }
+    NfcDb DB;
+    l_db = DB.getDB();
+
+    if (l_db.open())
+    {
+        qDebug() << "DB connection opened.";
+        QSqlQuery adventureFetch(l_db);
+        //Fetch data to be filled in  adventureDoneOnUser model
+        QString adventureQuery = QString("select da.Adventure_id,ad.Name,ad.Award,ad.Status,ad.Description,ad.Clue from Done_Adventures da, Adventures ad where da.User_id = %1 and ad.Adventure_id = da.Adventure_id;").arg(user_id);
+        qDebug() << "Querry "<< adventureQuery;
+        if (adventureFetch.exec(adventureQuery))
+        {
+            while (adventureFetch.next()) {
+                l_userDoneAdventureTable.append(new AdventureOnUserData(adventureFetch.value(0).toInt(), adventureFetch.value(1).toString(),adventureFetch.value(2).toInt(),adventureFetch.value(3).toInt(),adventureFetch.value(4).toString(),adventureFetch.value(5).toString()));
                  qDebug() << "Querry  got adventure: "<<adventureFetch.value(1).toString();
             }
             l_db.close();

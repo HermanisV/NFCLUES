@@ -71,7 +71,7 @@ Flickable{
                 height: Screen.height * 0.07
                 font.pixelSize: 36
                 placeholderText: "Password"
-                echoMode: TextInput.PasswordEchoOnEdit
+                echoMode: TextInput.Password
             }
             TextField {
                 id: userPasswordRepeat
@@ -81,7 +81,7 @@ Flickable{
                 height: Screen.height * 0.07
                 font.pixelSize: 36
                 placeholderText: "Password again"
-                echoMode: TextInput.PasswordEchoOnEdit
+                echoMode: TextInput.Password
             }
         }
         RowLayout {
@@ -120,12 +120,17 @@ Flickable{
                 Layout.minimumWidth: parent.width * 0.5
                 text: qsTr("Register")
                 onClicked: {
-                    mainUserHandle.login = userLogin.text
-                    mainUserHandle.email = userEmail.text
-                    mainUserHandle.password = userPassword.text
-                    mainUserHandle.createNewUser();
-                    if (mainUserHandle.userOK){
-                        gotLogin()
+                    if (userPassword.text != userPasswordRepeat.text){
+                      errorDialog.showError("Passwords must match")
+                    }
+                    else{
+                        mainUserHandle.login = userLogin.text
+                        mainUserHandle.email = userEmail.text
+                        mainUserHandle.password = userPassword.text
+                        mainUserHandle.createNewUser();
+                        if (mainUserHandle.userOK){
+                            gotLogin()
+                        }
                     }
                 }
             }

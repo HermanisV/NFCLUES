@@ -92,10 +92,13 @@ Flickable{
                 Layout.minimumWidth: parent.width * 0.5
                 text: qsTr("Login")
                 onClicked: {
+                    isLoading = true
                     mainUserHandle.loginUser(logUserLogin.text,logUserPassword.text);
                     if (mainUserHandle.userOK){
+                        isLoading = false
                         gotLogin()
                     }
+                    isLoading = false
                 }
             }
         }
